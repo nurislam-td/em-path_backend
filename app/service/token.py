@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import jwt
 from models.auth import RefreshToken
@@ -65,3 +66,27 @@ async def saveToken(user_id, refresh_token, session) -> RefreshToken:
     return await token.create(
         db=session, obj_in={"user_id": user_id, "refresh_token": refresh_token}
     )
+
+
+def validate_refresh_token(token: str):
+    try:
+        payload = decode_jwt(
+            token=token, key=settings.auth_config.refresh_public_path.read_text()
+        )
+        return payload
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"invalid token error {e}"
+        )
+
+
+def validate_access_token(token: str):
+    try:
+        payload = decode_jwt(
+            token=token, key=settings.auth_config.access_public_path.read_text()
+        )
+        return payload
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"invalid token error {e}"
+        )

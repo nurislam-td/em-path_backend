@@ -35,3 +35,11 @@ async def login(auth_data: AuthUser, session: AsyncSession):
     access_token, refresh_token = token.generate_tokens(jwt_data=jwt_data)
     await token.saveToken(user_obj.user_id, refresh_token, session)
     return TokenOut(access_token=access_token, refresh_token=refresh_token)
+
+
+async def refresh_tokens(refresh_token: str, session: AsyncSession):
+    payload = token.validate_refresh_token(token=refresh_token)
+    jwt_data = JWTData(sub=payload["sub"], email=payload["email"])
+    access_token, refresh_token = token.generate_tokens(jwt_data=jwt_data)
+    await token.saveToken(payload["sub"], refresh_token, session)
+    return TokenOut(access_token=access_token, refresh_token=refresh_token)

@@ -50,4 +50,4 @@ async def verify_code(
 async def refresh_token(
     refresh_token: str, session=Depends(db.scoped_session_dependency)
 ):
-    pass
+    return await user.refresh_tokens(refresh_token=refresh_token, session=session)
