@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from fastapi.encoders import jsonable_encoder
 import jwt
-from auth import RefreshToken
+from models.auth import RefreshToken
 from config.settings import settings
 from schemas.token import JWTData, RefreshTokenCreate
 from crud.crud_token import token

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from service.secure import get_password_hash, verify_password
 from crud.base import CRUDBase
-from auth import User
+from models.auth import User
 from schemas.user import UserCreate, UserUpdate
 
 

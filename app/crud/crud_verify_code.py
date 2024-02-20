@@ -1,5 +1,5 @@
 from .base import CRUDBase
-from auth import VerifyCode
+from models.auth import VerifyCode
 from schemas.verify_code import VerifyCodeCreate, VerifyCodeUpdate
 
 

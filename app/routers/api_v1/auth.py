@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from pydantic import EmailStr
 from schemas.token import TokenOut
 from config.database import db
-from auth import User
+from models.auth import User
 from schemas.user import AuthUser, UserCreate, UserInDbBase
 from schemas.verify_code import VerifyOut, VerifyCodeCheck
 from service import user, email

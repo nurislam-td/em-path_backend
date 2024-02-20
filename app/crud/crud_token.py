@@ -1,6 +1,6 @@
 from sqlalchemy import Result, select
 from .base import CRUDBase
-from auth import RefreshToken
+from models.auth import RefreshToken
 from schemas.token import RefreshTokenCreate, RefreshTokenUpdate
 from sqlalchemy.ext.asyncio import AsyncSession
 
