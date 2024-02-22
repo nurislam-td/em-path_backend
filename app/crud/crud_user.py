@@ -36,7 +36,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if update_data["password"]:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
-            update_data["hashed_password"] = hashed_password
+            update_data["password"] = hashed_password
         return await super().update(db, db_obj=db_obj, obj_in=update_data)
 
 

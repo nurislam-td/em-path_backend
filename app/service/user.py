@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.token import JWTData, TokenOut
 from crud.crud_user import user
-from schemas.user import UserCreate, AuthUser
+from schemas.user import UserCreate, AuthUser, UserUpdate
 from fastapi import HTTPException, status
 from service import secure, token
 
@@ -43,3 +43,9 @@ async def refresh_tokens(refresh_token: str, session: AsyncSession):
     access_token, refresh_token = token.generate_tokens(jwt_data=jwt_data)
     await token.saveToken(payload["sub"], refresh_token, session)
     return TokenOut(access_token=access_token, refresh_token=refresh_token)
+
+
+async def reset_password(update_data: UserUpdate, session: AsyncSession):
+    user_obj = await user.get_by_email(db=session, email=update_data.email)
+    user_obj = await user.update(db=session, db_obj=user_obj, obj_in=update_data)
+    return user_obj

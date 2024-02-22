@@ -3,7 +3,7 @@ from pydantic import EmailStr
 from schemas.token import TokenOut
 from config.database import db
 from models.auth import User
-from schemas.user import AuthUser, UserCreate, UserInDbBase
+from schemas.user import AuthUser, UserCreate, UserInDbBase, UserUpdate
 from schemas.verify_code import VerifyOut, VerifyCodeCheck
 from service import user, email
 from fastapi.security import OAuth2PasswordRequestForm
@@ -21,7 +21,7 @@ async def register_user(
     return user_obj
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=TokenOut)
+@router.post("/users/login", status_code=status.HTTP_200_OK, response_model=TokenOut)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session=Depends(db.scoped_session_dependency),
@@ -51,3 +51,10 @@ async def refresh_token(
     refresh_token: str, session=Depends(db.scoped_session_dependency)
 ):
     return await user.refresh_tokens(refresh_token=refresh_token, session=session)
+
+
+@router.post("/user/reset_password")
+async def reset_password(
+    update_data: UserUpdate, session=Depends(db.scoped_session_dependency)
+):
+    return await user.reset_password(update_data=update_data, session=session)
