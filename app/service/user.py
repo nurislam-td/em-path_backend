@@ -1,51 +1,68 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.token import JWTData, TokenOut
-from crud.crud_user import user
-from schemas.user import UserCreate, AuthUser, UserUpdate
+from typing import Any
+from uuid import UUID
+from config.database import IUnitOfWork
+from schemas.token import JWTPayload, TokenOut
+from schemas.user import UserCreate, UserResetPassword, UserUpdate, UserDTO
 from fastapi import HTTPException, status
-from service import secure, token
+from service import token
 
 
-async def validate_auth_data(user_data: AuthUser, session: AsyncSession):
-    user_obj = await user.get_by_email(db=session, email=user_data.email)
-    if not user_obj:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="invalid email or password"
+async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> dict[str, Any]:
+    async with uow:
+        is_exists = await uow.user.get_by_email(email=user_data.email)
+        if is_exists:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The user with this email already exists in the system.",
+            )
+        user_dict = await uow.user.create(user_in=user_data)
+        await uow.commit()
+        return UserDTO.model_validate(user_dict)
+
+
+async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:
+    jwt_data = JWTPayload(sub=user_data.id, email=user_data.email)
+    access_token, refresh_token = token.generate_tokens(jwt_payload=jwt_data)
+    async with uow:
+        await uow.token.saveToken(jwt_data.sub, refresh_token)
+        await uow.commit()
+        return TokenOut(access_token=access_token, refresh_token=refresh_token)
+
+
+async def refresh_tokens(jwt_payload: JWTPayload, uow: IUnitOfWork) -> TokenOut:
+    access_token, refresh_token = token.generate_tokens(jwt_payload=jwt_payload)
+    async with uow:
+        await uow.token.saveToken(jwt_payload.sub, refresh_token)
+        await uow.commit()
+        return TokenOut(access_token=access_token, refresh_token=refresh_token)
+
+
+async def reset_password(update_data: UserResetPassword, uow: IUnitOfWork) -> UserDTO:
+    async with uow:
+        user_dict: dict[str, Any] = await uow.user.get_by_email(email=update_data.email)
+        updated_user = await uow.user.update(
+            user_in=update_data, user_id=user_dict.get("id")
         )
-    if not secure.verify_password(user_data.password, user_obj.password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="invalid email or password"
-        )
-    return user_obj
+        await uow.commit()
+        return UserDTO.model_validate(updated_user)
 
 
-async def create_user(user_data: UserCreate, session: AsyncSession):
-    is_exists = await user.get_by_email(db=session, email=user_data.email)
-    if is_exists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The user with this email already exists in the system.",
-        )
-    return await user.create(db=session, obj_in=user_data)
+async def update_user(
+    user_id: UUID, update_data: UserUpdate, uow: IUnitOfWork
+) -> UserDTO:
+    async with uow:
+        updated_user = await uow.user.update(user_in=update_data, user_id=user_id)
+        await uow.commit()
+        return UserDTO.model_validate(updated_user)
 
 
-async def login(auth_data: AuthUser, session: AsyncSession):
-    user_obj = await validate_auth_data(auth_data, session)
-    jwt_data = JWTData(sub=user_obj.user_id, email=user_obj.email)
-    access_token, refresh_token = token.generate_tokens(jwt_data=jwt_data)
-    await token.saveToken(user_obj.user_id, refresh_token, session)
-    return TokenOut(access_token=access_token, refresh_token=refresh_token)
+async def delete_user(user_id: UUID, uow: IUnitOfWork):
+    async with uow:
+        await uow.user.delete(filters={"id": user_id})
+        await uow.commit()
 
 
-async def refresh_tokens(refresh_token: str, session: AsyncSession):
-    payload = token.validate_refresh_token(token=refresh_token)
-    jwt_data = JWTData(sub=payload["sub"], email=payload["email"])
-    access_token, refresh_token = token.generate_tokens(jwt_data=jwt_data)
-    await token.saveToken(payload["sub"], refresh_token, session)
-    return TokenOut(access_token=access_token, refresh_token=refresh_token)
-
-
-async def reset_password(update_data: UserUpdate, session: AsyncSession):
-    user_obj = await user.get_by_email(db=session, email=update_data.email)
-    user_obj = await user.update(db=session, db_obj=user_obj, obj_in=update_data)
-    return user_obj
+async def get_all(uow: IUnitOfWork) -> list[UserDTO]:
+    async with uow:
+        users_list = await uow.user.get_all()
+        return [UserDTO.model_validate(user_dict) for user_dict in users_list]

@@ -1,6 +1,7 @@
+from datetime import datetime
 from enum import Enum
 from uuid import UUID
-from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, field_validator
 import re
 
 STRONG_PASSWORD_PATTERN = re.compile(
@@ -8,13 +9,18 @@ STRONG_PASSWORD_PATTERN = re.compile(
 )
 
 
+class Sex(str, Enum):
+    male = "Male"
+    woman = "Woman"
+    unknown = "Unknown"
+
+
 class UserOut(BaseModel):
     nickname: str
-    email: str
-
-
-class AuthUser(BaseModel):
     email: EmailStr
+
+
+class UserCreate(UserOut):
     password: str = Field(min_length=6, max_length=128)
 
     @field_validator("password", mode="after")
@@ -31,16 +37,6 @@ class AuthUser(BaseModel):
         return password
 
 
-class UserCreate(AuthUser):
-    nickname: str
-
-
-class Sex(str, Enum):
-    male = "male"
-    woman = "woman"
-    unknown = "unknown"
-
-
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     nickname: str | None = None
@@ -53,7 +49,17 @@ class UserUpdate(BaseModel):
     password: str | None = None
 
 
-class UserInDbBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    nickname: str
-    email: str
+class UserResetPassword(UserUpdate):
+    email: EmailStr
+    password: str
+
+
+class UserDTO(UserOut):
+    id: UUID
+    password: bytes
+    sex: Sex | None = Sex.unknown
+    name: str | None = None
+    lastname: str | None = None
+    patronymic: str | None = None
+    date_birth: datetime | None = None
+    image: str | None = None

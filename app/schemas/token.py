@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from config.settings import settings
 
 
-class JWTData(BaseModel):
+class JWTPayload(BaseModel):
     sub: UUID
     email: str
 
@@ -26,7 +26,7 @@ class RefreshTokenUpdate(BaseModel):
 
 
 class RefreshTokenInDB(BaseModel):
-    rt_id: str
+    id: str
     user_id: str
     refresh_token: str
     expires_at: str

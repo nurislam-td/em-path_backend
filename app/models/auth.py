@@ -19,35 +19,35 @@ class Sex(enum.Enum):
 
 class User(Base):
     __tablename__ = "user"
-    user_id: Mapped[UUID] = mapped_column(
+    id: Mapped[UUID] = mapped_column(
         types.Uuid,
         primary_key=True,
         server_default=text("gen_random_uuid()"),  # use what you have on your server
         index=True,
     )
-    nickname: Mapped[str] = mapped_column(String(length=12))
-    password: Mapped[bytes] = mapped_column()
+    password: Mapped[bytes]
     email: Mapped[str] = mapped_column(String(length=255), index=True, unique=True)
+    nickname: Mapped[str] = mapped_column(String(length=12))
     sex: Mapped[Sex] = mapped_column(Enum(Sex), default=Sex.unknown)
-    name: Mapped[str | None] = mapped_column(default=None)
-    lastname: Mapped[str | None] = mapped_column(default=None)
-    patronymic: Mapped[str | None] = mapped_column(default=None)
-    date_birth: Mapped[datetime | None] = mapped_column(default=None)
-    image: Mapped[str | None] = mapped_column(default=None)
+    name: Mapped[str | None]
+    lastname: Mapped[str | None]
+    patronymic: Mapped[str | None]
+    date_birth: Mapped[datetime | None]
+    image: Mapped[str | None]
     refresh_token: Mapped[List["RefreshToken"]] = relationship(
-        back_populates="user", cascade="all,delete"
+        back_populates="user", cascade="all, delete"
     )
 
 
 class RefreshToken(Base):
     __tablename__ = "refresh_token"
-    rt_id: Mapped[UUID] = mapped_column(
+    id: Mapped[UUID] = mapped_column(
         primary_key=True,
         index=True,
         server_default=text("gen_random_uuid()"),
     )
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.user_id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship(back_populates="refresh_token")
     refresh_token: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
