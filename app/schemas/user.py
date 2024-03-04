@@ -49,7 +49,7 @@ class UserUpdate(BaseModel):
     password: str | None = None
 
 
-class UserResetPassword(UserUpdate):
+class UserResetPassword(BaseModel):
     email: EmailStr
     password: str
 
