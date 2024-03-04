@@ -20,4 +20,6 @@ class UserRepo(SQLAlchemyRepo):
     async def update(self, user_in: UserUpdate, user_id):
         if user_in.password:
             user_in.password = get_password_hash(user_in.password)
-        return await super().update(user_in.model_dump(exclude_unset=True), user_id)
+        return await super().update(
+            user_in.model_dump(exclude_unset=True), {"id": user_id}
+        )
