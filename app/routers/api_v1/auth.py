@@ -75,9 +75,13 @@ async def get_me(user_data: UserDTO = Depends(get_current_user)) -> UserDTO:
     description="Refresh tokens via token(refresh_token)",
 )
 async def refresh_token(
-    jwt_payload: Annotated[JWTPayload, Depends(validate_refresh_token)], uow: UOWDep
+    response: Response,
+    jwt_payload: Annotated[JWTPayload, Depends(validate_refresh_token)],
+    uow: UOWDep,
 ) -> TokenOut:
-    return await user.refresh_tokens(jwt_payload=jwt_payload, uow=uow)
+    tokens = await user.refresh_tokens(jwt_payload=jwt_payload, uow=uow)
+    response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
+    return tokens
 
 
 @router.patch(
