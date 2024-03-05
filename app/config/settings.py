@@ -1,5 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings
+from pydantic import Field
 import os
 
 
@@ -7,12 +8,16 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class DbSettings(BaseSettings):
-    user: str = os.environ.get("DB_USER")
-    password: str = os.environ.get("DB_PASSWORD")
-    host: str = os.environ.get("DB_HOST")
-    port: str = os.environ.get("DB_PORT")
-    dbname: str = os.environ.get("DB_NAME")
-    url: str = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{dbname}"
+    user: str = Field(alias="DB_USER")
+    password: str = Field(alias="DB_PASSWORD")
+    host: str = Field(alias="DB_HOST")
+    port: str = Field(alias="DB_PORT")
+    dbname: str = Field(alias="DB_NAME")
+
+    @property
+    def url(self):
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
+
     # echo: bool = False
     echo: bool = True
 
