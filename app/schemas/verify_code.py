@@ -19,7 +19,7 @@ class VerifyCodeCreate(BaseModel):
 
 
 class VerifyCodeCheck(BaseModel):
-    id: int
+    email: str
     code: str
 
 

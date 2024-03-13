@@ -1,15 +1,16 @@
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
 from pydantic import EmailStr
+from config.database import IUnitOfWork
 
 from schemas.token import JWTPayload, TokenOut
-from schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
+from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate
 from schemas.verify_code import VerifyOut, VerifyCodeCheck
 from service import user, email
 from .dependencies import (
-    UOWDep,
     get_current_user,
+    get_uow,
     validate_auth_data,
     validate_refresh_token,
 )
@@ -23,8 +24,8 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 )
 async def register_user(
     user_data: UserCreate,
-    uow: UOWDep,
-) -> UserDTO:
+    uow: IUnitOfWork = Depends(get_uow),
+) -> UserOut:
     return await user.create_user(user_data, uow=uow)
 
 
@@ -34,7 +35,7 @@ async def register_user(
 async def login(
     response: Response,
     user_data: Annotated[UserDTO, Depends(validate_auth_data)],
-    uow: UOWDep,
+    uow: IUnitOfWork = Depends(get_uow),
 ) -> TokenOut:
     tokens = await user.login(user_data=user_data, uow=uow)
     response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
@@ -42,22 +43,29 @@ async def login(
 
 
 @router.post(
-    "/users/email/send_code",
+    "/users/email",
     status_code=status.HTTP_200_OK,
     description="Send verify code to email_in",
 )
-async def send_verify_message(email_in: EmailStr, uow: UOWDep) -> VerifyOut:
-    return await email.send_verify_message(email=email_in, uow=uow)
+async def send_verify_message(
+    background_tasks: BackgroundTasks,
+    email_in: EmailStr,
+    uow: IUnitOfWork = Depends(get_uow),
+) -> dict[str, str]:
+    background_tasks.add_task(email.send_verify_message, email_in, uow)
+    return {"status": "200", "message": "mail has been sended"}
 
 
 @router.post(
-    "/users/email/verify",
+    "/users/email/code",
     status_code=status.HTTP_200_OK,
     description="Check code valid",
 )
-async def verify_code(code: VerifyCodeCheck, uow: UOWDep) -> int:
+async def verify_code(
+    code: VerifyCodeCheck, uow: IUnitOfWork = Depends(get_uow)
+) -> bool:
     await email.check_code(code, uow=uow)
-    return status.HTTP_200_OK
+    return True
 
 
 @router.get(
@@ -70,14 +78,14 @@ async def get_me(user_data: UserDTO = Depends(get_current_user)) -> UserDTO:
 
 
 @router.post(
-    "/users/token/refresh",
+    "/users/token/refresh-token",
     status_code=status.HTTP_200_OK,
     description="Refresh tokens via token(refresh_token)",
 )
 async def refresh_token(
     response: Response,
-    jwt_payload: Annotated[JWTPayload, Depends(validate_refresh_token)],
-    uow: UOWDep,
+    jwt_payload: JWTPayload = Depends(validate_refresh_token),
+    uow: IUnitOfWork = Depends(get_uow),
 ) -> TokenOut:
     tokens = await user.refresh_tokens(jwt_payload=jwt_payload, uow=uow)
     response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
@@ -85,13 +93,13 @@ async def refresh_token(
 
 
 @router.patch(
-    "/users/reset_password",
+    "/users/password",
     status_code=status.HTTP_200_OK,
     description="User password reset func",
 )
 async def reset_password(
     update_data: UserResetPassword,
-    uow: UOWDep,
+    uow: IUnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     return await user.reset_password(update_data=update_data, uow=uow)
 
@@ -103,7 +111,7 @@ async def reset_password(
 )
 async def update_user(
     update_data: UserUpdate,
-    uow: UOWDep,
+    uow: IUnitOfWork = Depends(get_uow),
     user_data: UserDTO = Depends(get_current_user),
 ) -> UserDTO:
     return await user.update_user(
@@ -116,14 +124,14 @@ async def update_user(
     status_code=status.HTTP_200_OK,
     description="Delete user",
 )
-async def delete_user(user_id: UUID, uow: UOWDep) -> None:
+async def delete_user(user_id: UUID, uow: IUnitOfWork = Depends(get_uow)) -> None:
     await user.delete_user(user_id=user_id, uow=uow)
 
 
 @router.get(
-    "/users/",
+    "/users",
     status_code=status.HTTP_200_OK,
     description="Get all users from DB",
 )
-async def get_users(uow: UOWDep) -> list[UserDTO]:
+async def get_users(uow: IUnitOfWork = Depends(get_uow)) -> list[UserDTO]:
     return await user.get_all(uow=uow)

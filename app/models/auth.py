@@ -11,10 +11,10 @@ from sqlalchemy import ForeignKey, types, text, Enum, String, func
 from .base import Base
 
 
-class Sex(enum.Enum):
-    male = "Male"
-    female = "Female"
-    unknown = "Unknown"
+class Sex(str, enum.Enum):
+    male = "male"
+    female = "female"
+    unknown = "unknown"
 
 
 class User(Base):

@@ -19,7 +19,7 @@ MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 MAIL_PORT = os.environ.get("MAIL_PORT", 587)
 
 
-async def send_email_message(emails: list[EmailStr], message) -> MIMEText:
+def send_email_message(emails: list[EmailStr], message) -> MIMEText:
     body = message
     message = MIMEText(body)
     message["From"] = MAIL_USERNAME
@@ -43,7 +43,7 @@ async def send_email_message(emails: list[EmailStr], message) -> MIMEText:
 async def send_verify_message(email: str, uow: IUnitOfWork) -> VerifyOut:
     email_code = generate_random_num()
     message = f"This your verification code {email_code}"
-    message = await send_email_message([email], message=message)
+    message = send_email_message([email], message=message)
     async with uow:
         verify_code_dict = await uow.verify_code.create(
             values={
@@ -58,9 +58,11 @@ async def send_verify_message(email: str, uow: IUnitOfWork) -> VerifyOut:
 
 async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
     async with uow:
-        code_dict = await uow.verify_code.get(code.id)
-        if code_dict["is_active"]:
-            return await uow.verify_code.delete(filters={"id": code_dict["id"]})
+        code_dict = await uow.verify_code.get_by_email(email_in=code.email)
+        if code_dict and code.code == code_dict["code"]:
+            await uow.verify_code.delete(filters={"id": code_dict["id"]})
+            await uow.commit()
+            return 200
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="invalid code"

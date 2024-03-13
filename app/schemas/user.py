@@ -10,9 +10,9 @@ STRONG_PASSWORD_PATTERN = re.compile(
 
 
 class Sex(str, Enum):
-    male = "Male"
-    woman = "Woman"
-    unknown = "Unknown"
+    male = "male"
+    female = "female"
+    unknown = "unknown"
 
 
 class UserOut(BaseModel):

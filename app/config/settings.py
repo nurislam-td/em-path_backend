@@ -1,7 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic import Field
-import os
 
 
 BASE_DIR = Path(__file__).parent.parent.parent
@@ -41,6 +40,8 @@ class Settings(BaseSettings):
     db: DbSettings = DbSettings()
 
     auth_config: AuthJWT = AuthJWT()
+
+    MODE: str
 
 
 settings = Settings()

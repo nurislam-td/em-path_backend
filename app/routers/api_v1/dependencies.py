@@ -12,7 +12,10 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from config.database import UnitOfWork, IUnitOfWork
 
 
-UOWDep = Annotated[IUnitOfWork, Depends(UnitOfWork)]
+def get_uow() -> IUnitOfWork:
+    return UnitOfWork()
+
+
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api_v1/auth/users/login",
 )
@@ -20,7 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 async def validate_auth_data(
     user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
-    uow: UOWDep,
+    uow: IUnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     async with uow:
         user_dict = await uow.user.get_by_email(user_credentials.username)
@@ -37,10 +40,11 @@ async def validate_auth_data(
         return UserDTO.model_validate(user_dict)
 
 
-def validate_refresh_token(token: str) -> JWTPayload:
+def validate_refresh_token(refresh_token: str) -> JWTPayload:
     try:
         payload = decode_jwt(
-            token=token, key=settings.auth_config.refresh_public_path.read_text()
+            token=refresh_token,
+            key=settings.auth_config.refresh_public_path.read_text(),
         )
         return JWTPayload.model_validate(payload)
     except jwt.InvalidTokenError as e:
@@ -49,10 +53,10 @@ def validate_refresh_token(token: str) -> JWTPayload:
         )
 
 
-def validate_access_token(token: str) -> JWTPayload:
+def validate_access_token(access_token: str) -> JWTPayload:
     try:
         payload = decode_jwt(
-            token=token, key=settings.auth_config.access_public_path.read_text()
+            token=access_token, key=settings.auth_config.access_public_path.read_text()
         )
         return JWTPayload.model_validate(payload)
     except jwt.InvalidTokenError as e:
@@ -61,13 +65,13 @@ def validate_access_token(token: str) -> JWTPayload:
         )
 
 
-def get_token_payload(token: Annotated[str, Depends(oauth2_scheme)]) -> JWTPayload:
-    return validate_access_token(token=token)
+def get_token_payload(token: str = Depends(oauth2_scheme)) -> JWTPayload:
+    return validate_access_token(access_token=token)
 
 
 async def get_current_user(
-    payload: Annotated[JWTPayload, Depends(get_token_payload)],
-    uow: UOWDep,
+    payload: JWTPayload = Depends(get_token_payload),
+    uow: IUnitOfWork = Depends(get_uow),
 ):
     async with uow:
         user_dict = await uow.user.get(id=payload.sub)

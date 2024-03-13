@@ -2,12 +2,12 @@ from typing import Any
 from uuid import UUID
 from config.database import IUnitOfWork
 from schemas.token import JWTPayload, TokenOut
-from schemas.user import UserCreate, UserResetPassword, UserUpdate, UserDTO
+from schemas.user import UserCreate, UserOut, UserResetPassword, UserUpdate, UserDTO
 from fastapi import HTTPException, status
 from service import token
 
 
-async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> dict[str, Any]:
+async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserOut:
     async with uow:
         is_exists = await uow.user.get_by_email(email=user_data.email)
         if is_exists:
@@ -17,7 +17,7 @@ async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> dict[str, Any]
             )
         user_dict = await uow.user.create(user_in=user_data)
         await uow.commit()
-        return UserDTO.model_validate(user_dict)
+        return UserOut.model_validate(user_dict)
 
 
 async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:
