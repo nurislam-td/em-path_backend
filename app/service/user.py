@@ -1,6 +1,6 @@
 from typing import Any
 from uuid import UUID
-from config.database import IUnitOfWork
+from core.database import IUnitOfWork
 from schemas.token import JWTPayload, TokenOut
 from schemas.user import UserCreate, UserOut, UserResetPassword, UserUpdate, UserDTO
 from fastapi import HTTPException, status
@@ -50,8 +50,12 @@ async def reset_password(update_data: UserResetPassword, uow: IUnitOfWork) -> Us
 async def update_user(
     user_id: UUID, update_data: UserUpdate, uow: IUnitOfWork
 ) -> UserDTO:
+    if not update_data:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     async with uow:
-        updated_user = await uow.user.update(user_in=update_data, user_id=user_id)
+        updated_user = await uow.user.update(
+            update_data.model_dump(exclude_unset=True), {"id": user_id}
+        )
         await uow.commit()
         return UserDTO.model_validate(updated_user)
 

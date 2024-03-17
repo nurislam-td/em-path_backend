@@ -45,12 +45,11 @@ class SQLAlchemyRepo(AbstractRepo):
 
     async def fetch_one(self, query: Select | Insert | Update) -> dict[str, Any] | None:
         result: Result = await self.session.execute(query)
-        row = result.one_or_none()
-        return row._asdict() if row else None
+        return result.mappings().one_or_none()
 
     async def fetch_all(self, query: Select | Insert | Update) -> list[dict[str, Any]]:
         result: Result = await self.session.execute(query)
-        return [r._asdict() for r in result.all()]
+        return list(result.mappings().all())
 
     async def execute(self, query: Insert | Update | Delete) -> None:
         await self.session.execute(query)

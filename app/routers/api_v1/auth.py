@@ -2,7 +2,7 @@ from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
 from pydantic import EmailStr
-from config.database import IUnitOfWork
+from core.database import IUnitOfWork
 
 from schemas.token import JWTPayload, TokenOut
 from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate

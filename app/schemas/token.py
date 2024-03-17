@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from uuid import UUID
 from pydantic import BaseModel, Field
 
-from config.settings import settings
+from core.settings import settings
 
 
 class JWTPayload(BaseModel):

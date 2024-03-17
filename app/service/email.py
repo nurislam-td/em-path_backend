@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from ssl import create_default_context
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from config.database import IUnitOfWork
+from core.database import IUnitOfWork
 
 
 load_dotenv()

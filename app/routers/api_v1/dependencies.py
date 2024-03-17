@@ -4,12 +4,12 @@ import jwt
 from fastapi import HTTPException, status, Depends
 from schemas.token import JWTPayload
 
-from config.settings import settings
+from core.settings import settings
 from service.token import decode_jwt
 from schemas.user import UserDTO
 from service import secure
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from config.database import UnitOfWork, IUnitOfWork
+from core.database import UnitOfWork, IUnitOfWork
 
 
 def get_uow() -> IUnitOfWork:
