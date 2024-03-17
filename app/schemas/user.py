@@ -21,7 +21,7 @@ class UserOut(BaseModel):
 
 
 class UserCreate(UserOut):
-    password: str = Field(min_length=6, max_length=128)
+    password: str | bytes = Field(min_length=6, max_length=128)
 
     @field_validator("password", mode="after")
     @classmethod
@@ -56,7 +56,7 @@ class UserUpdate(BaseModel):
 
 class UserResetPassword(BaseModel):
     email: EmailStr
-    password: str
+    password: str | bytes
 
     @field_validator("password", mode="after")
     @classmethod
