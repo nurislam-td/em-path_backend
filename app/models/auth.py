@@ -1,13 +1,15 @@
-from datetime import datetime
 import enum
+from datetime import datetime
 from typing import List
 from uuid import UUID
+
+from sqlalchemy import Enum, ForeignKey, String, func, text, types
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
     relationship,
 )
-from sqlalchemy import ForeignKey, types, text, Enum, String, func
+
 from .base import Base
 
 

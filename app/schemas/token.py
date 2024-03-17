@@ -1,8 +1,6 @@
-from datetime import datetime, timedelta
 from uuid import UUID
-from pydantic import BaseModel, Field
 
-from core.settings import settings
+from pydantic import BaseModel
 
 
 class JWTPayload(BaseModel):

@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import Any
+
 from sqlalchemy import (
+    Delete,
+    Insert,
     Result,
     Select,
-    Insert,
     Update,
-    Delete,
-    select,
-    insert,
-    update,
     delete,
+    insert,
+    select,
+    update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase

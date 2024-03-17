@@ -1,16 +1,14 @@
 import os
-from typing import Any
-from fastapi import HTTPException, status
-from pydantic import EmailStr
-from core.exceptions import IncorrectVerificationCode
-from schemas.verify_code import VerifyCodeCheck, VerifyOut
-from service.secure import generate_random_num
-from dotenv import load_dotenv
-from ssl import create_default_context
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from core.database import IUnitOfWork
+from ssl import create_default_context
 
+from core.database import IUnitOfWork
+from core.exceptions import IncorrectVerificationCode
+from dotenv import load_dotenv
+from pydantic import EmailStr
+from schemas.verify_code import VerifyCodeCheck, VerifyOut
+from service.secure import generate_random_num
 
 load_dotenv()
 

@@ -1,6 +1,7 @@
-from sqlalchemy import select
-from .base import SQLAlchemyRepo
 from models.auth import RefreshToken
+from sqlalchemy import select
+
+from .base import SQLAlchemyRepo
 
 
 class TokenRepo(SQLAlchemyRepo):

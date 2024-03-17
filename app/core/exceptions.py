@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-from fastapi.exceptions import RequestValidationError
 
 
 class AppException(HTTPException):

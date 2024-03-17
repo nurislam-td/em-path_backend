@@ -1,11 +1,10 @@
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Any
-from fastapi import HTTPException, status
-from fastapi.encoders import jsonable_encoder
+
 import jwt
 from core.database import IUnitOfWork
-from models.auth import RefreshToken
 from core.settings import settings
+from fastapi.encoders import jsonable_encoder
 from schemas.token import JWTPayload, TokenOut
 
 

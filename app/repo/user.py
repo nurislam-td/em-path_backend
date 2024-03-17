@@ -1,9 +1,11 @@
 from uuid import UUID
-from sqlalchemy import select
-from .base import SQLAlchemyRepo
+
 from models.auth import User
-from schemas.user import UserCreate, UserResetPassword, UserUpdate
+from schemas.user import UserCreate, UserResetPassword
 from service.secure import get_password_hash
+from sqlalchemy import select
+
+from .base import SQLAlchemyRepo
 
 
 class UserRepo(SQLAlchemyRepo):

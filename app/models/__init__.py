@@ -6,5 +6,5 @@ __all__ = (
 )
 
 
+from .auth import RefreshToken, User, VerifyCode
 from .base import Base
-from .auth import User, VerifyCode, RefreshToken

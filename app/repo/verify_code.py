@@ -1,6 +1,6 @@
-from sqlalchemy import select
-from repo.base import SQLAlchemyRepo
 from models.auth import VerifyCode
+from repo.base import SQLAlchemyRepo
+from sqlalchemy import select
 
 
 class VerifyCodeRepo(SQLAlchemyRepo):

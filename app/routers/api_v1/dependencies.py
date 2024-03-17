@@ -1,20 +1,19 @@
 from typing import Annotated
 
-from fastapi import HTTPException, status, Depends
-from schemas.token import JWTPayload
+from core.database import IUnitOfWork, UnitOfWork
+from core.exceptions import IncorrectCredentialsExceptions, InvalidToken
+from core.settings import settings
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import (
-    InvalidSignatureError,
     ExpiredSignatureError,
+    InvalidSignatureError,
     InvalidTokenError,
 )
-
-from core.settings import settings
-from service.token import decode_jwt
+from schemas.token import JWTPayload
 from schemas.user import UserDTO
 from service import secure
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from core.database import UnitOfWork, IUnitOfWork
-from core.exceptions import IncorrectCredentialsExceptions, InvalidToken
+from service.token import decode_jwt
 
 
 def get_uow() -> IUnitOfWork:

@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Type
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
+from core.settings import settings
 from repo.token import TokenRepo
 from repo.user import UserRepo
 from repo.verify_code import VerifyCodeRepo
-from core.settings import settings
-
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 engine = create_async_engine(url=settings.db.url)
 async_session_maker = async_sessionmaker(

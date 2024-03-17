@@ -1,20 +1,20 @@
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
-from pydantic import EmailStr
-from core.database import IUnitOfWork
 
+from core.database import IUnitOfWork
+from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
+from pydantic import EmailStr
 from schemas.token import JWTPayload, TokenOut
 from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate
-from schemas.verify_code import VerifyOut, VerifyCodeCheck
-from service import user, email
+from schemas.verify_code import VerifyCodeCheck
+from service import email, user
+
 from .dependencies import (
     get_current_user,
     get_uow,
     validate_auth_data,
     validate_refresh_token,
 )
-
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

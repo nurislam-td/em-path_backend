@@ -1,8 +1,9 @@
+import re
 from datetime import datetime
 from enum import Enum
 from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-import re
 
 STRONG_PASSWORD_PATTERN = re.compile(
     r"(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,128}"

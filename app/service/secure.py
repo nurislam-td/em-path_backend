@@ -1,5 +1,6 @@
 import random
 import string
+
 import bcrypt
 
 NUM = string.digits

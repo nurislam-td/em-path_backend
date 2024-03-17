@@ -1,10 +1,10 @@
 from typing import Any
 from uuid import UUID
+
 from core.database import IUnitOfWork
 from core.exceptions import UserAlreadyExistsException
 from schemas.token import JWTPayload, TokenOut
-from schemas.user import UserCreate, UserOut, UserResetPassword, UserUpdate, UserDTO
-from fastapi import HTTPException, status
+from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate
 from service import token
 
 
