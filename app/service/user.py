@@ -1,6 +1,7 @@
 from typing import Any
 from uuid import UUID
 from core.database import IUnitOfWork
+from core.exceptions import UserAlreadyExistsException
 from schemas.token import JWTPayload, TokenOut
 from schemas.user import UserCreate, UserOut, UserResetPassword, UserUpdate, UserDTO
 from fastapi import HTTPException, status
@@ -11,10 +12,7 @@ async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserOut:
     async with uow:
         is_exists = await uow.user.get_by_email(email=user_data.email)
         if is_exists:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="The user with this email already exists in the system.",
-            )
+            raise UserAlreadyExistsException
         user_dict = await uow.user.create(user_in=user_data)
         await uow.commit()
         return UserOut.model_validate(user_dict)
@@ -50,8 +48,6 @@ async def reset_password(update_data: UserResetPassword, uow: IUnitOfWork) -> Us
 async def update_user(
     user_id: UUID, update_data: UserUpdate, uow: IUnitOfWork
 ) -> UserDTO:
-    if not update_data:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     async with uow:
         updated_user = await uow.user.update(
             update_data.model_dump(exclude_unset=True), {"id": user_id}

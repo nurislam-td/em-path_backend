@@ -53,7 +53,7 @@ async def send_verify_message(
     uow: IUnitOfWork = Depends(get_uow),
 ) -> dict[str, str]:
     background_tasks.add_task(email.send_verify_message, email_in, uow)
-    return {"status": "200", "message": "mail has been sended"}
+    return {"status": "202", "message": "mail has been sended"}
 
 
 @router.post(

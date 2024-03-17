@@ -2,6 +2,7 @@ import os
 from typing import Any
 from fastapi import HTTPException, status
 from pydantic import EmailStr
+from core.exceptions import IncorrectVerificationCode
 from schemas.verify_code import VerifyCodeCheck, VerifyOut
 from service.secure import generate_random_num
 from dotenv import load_dotenv
@@ -64,6 +65,4 @@ async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
             await uow.commit()
             return 200
         else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="invalid code"
-            )
+            raise IncorrectVerificationCode

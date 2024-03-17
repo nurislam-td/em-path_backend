@@ -1,8 +1,12 @@
 from typing import Annotated
 
-import jwt
 from fastapi import HTTPException, status, Depends
 from schemas.token import JWTPayload
+from jwt.exceptions import (
+    InvalidSignatureError,
+    ExpiredSignatureError,
+    InvalidTokenError,
+)
 
 from core.settings import settings
 from service.token import decode_jwt
@@ -10,6 +14,7 @@ from schemas.user import UserDTO
 from service import secure
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from core.database import UnitOfWork, IUnitOfWork
+from core.exceptions import IncorrectCredentialsExceptions, InvalidToken
 
 
 def get_uow() -> IUnitOfWork:
@@ -28,15 +33,9 @@ async def validate_auth_data(
     async with uow:
         user_dict = await uow.user.get_by_email(user_credentials.username)
         if not user_dict:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalid email or password",
-            )
+            raise IncorrectCredentialsExceptions
         if not secure.verify_password(user_credentials.password, user_dict["password"]):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalid email or password",
-            )
+            raise IncorrectCredentialsExceptions
         return UserDTO.model_validate(user_dict)
 
 
@@ -47,7 +46,14 @@ def validate_refresh_token(refresh_token: str) -> JWTPayload:
             key=settings.auth_config.refresh_public_path.read_text(),
         )
         return JWTPayload.model_validate(payload)
-    except jwt.InvalidTokenError as e:
+
+    except InvalidSignatureError:
+        raise InvalidToken
+
+    except ExpiredSignatureError:
+        raise InvalidToken
+
+    except InvalidTokenError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"invalid token error {e}"
         )
@@ -59,7 +65,14 @@ def validate_access_token(access_token: str) -> JWTPayload:
             token=access_token, key=settings.auth_config.access_public_path.read_text()
         )
         return JWTPayload.model_validate(payload)
-    except jwt.InvalidTokenError as e:
+
+    except InvalidSignatureError:
+        raise InvalidToken
+
+    except ExpiredSignatureError:
+        raise InvalidToken
+
+    except InvalidTokenError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"invalid token error {e}"
         )

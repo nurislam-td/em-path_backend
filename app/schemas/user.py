@@ -31,7 +31,7 @@ class UserCreate(UserOut):
                 "Password must contain at least "
                 "one lower character, "
                 "one upper character, "
-                "digit and"
+                "digit and "
                 "special symbol"
             )
         return password
