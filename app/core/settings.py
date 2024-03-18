@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -13,9 +14,19 @@ class DbSettings(BaseSettings):
     port: str = Field(alias="DB_PORT")
     dbname: str = Field(alias="DB_NAME")
 
+    test_user: str = Field(alias="TEST_DB_USER")
+    test_password: str = Field(alias="TEST_DB_PASSWORD")
+    test_host: str = Field(alias="TEST_DB_HOST")
+    test_port: str = Field(alias="TEST_DB_PORT")
+    test_dbname: str = Field(alias="TEST_DB_NAME")
+
     @property
-    def url(self):
+    def url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
+
+    @property
+    def test_url(self) -> str:
+        return f"postgresql+asyncpg://{self.test_user}:{self.test_password}@{self.test_host}:{self.test_port}/{self.test_dbname}"
 
     # echo: bool = False
     echo: bool = True
@@ -41,7 +52,7 @@ class Settings(BaseSettings):
 
     auth_config: AuthJWT = AuthJWT()
 
-    MODE: str
+    MODE: Literal["TEST", "DEV", "PROD"]
 
 
 settings = Settings()

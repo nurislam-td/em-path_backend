@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "*_test.py", "app/tests/*.py"]
+python_classes = ["Test", "Acceptance"]
+python_functions = ["test"]
+pythonpath = [".", "app"]
+env_files = [".test.env", ".env"]
+asyncio_mode = "auto"
+
+
+[tool.ruff.lint]
+select = ["E", "F", 'I']

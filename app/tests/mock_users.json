@@ -1,0 +1,50 @@
+[
+    {
+      "nickname": "string",
+      "email": "userus@example.com",
+      "id": "32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7",
+      "password": "$2b$12$pBXO3Qb8Q708eGJV3qyDCOMTwtK8I/2AI4xHzg7SsB8KEnPooWAly",
+      "sex": "unknown",
+      "name": null,
+      "lastname": null,
+      "patronymic": null,
+      "date_birth": null,
+      "image": null
+    },
+    {
+      "nickname": "string",
+      "email": "user3@example.com",
+      "id": "be067225-3570-4673-87f7-d65f6be7b1c1",
+      "password": "$2b$12$j3r3iYcSFOTnsYyFWNP..ecV3B/jumqKlQqkdRvkuecNW.3p.Me7y",
+      "sex": "unknown",
+      "name": null,
+      "lastname": null,
+      "patronymic": null,
+      "date_birth": null,
+      "image": null
+    },
+    {
+      "nickname": "string",
+      "email": "user4@example.com",
+      "id": "ecc14949-46c2-4f18-b71f-31f27c21797e",
+      "password": "$2b$12$VcjWRIS4bBT2kVl9cJYnWOJMkbGUfxJRKjugm7KHoiwV9aO/qBr/a",
+      "sex": "unknown",
+      "name": null,
+      "lastname": null,
+      "patronymic": null,
+      "date_birth": null,
+      "image": null
+    },
+    {
+      "nickname": "females",
+      "email": "user@example.com",
+      "id": "ae538ea8-0cc0-4e06-9649-f5fa7c28701b",
+      "password": "$2b$12$rhMQxCb/Dose5ovQ4FPbKeSjxaWIA/IkrVt4AxCikuxaZUz1Qgl2i",
+      "sex": "female",
+      "name": null,
+      "lastname": null,
+      "patronymic": null,
+      "date_birth": null,
+      "image": null
+    }
+  ]
