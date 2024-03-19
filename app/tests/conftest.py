@@ -2,10 +2,13 @@ import asyncio
 import json
 
 import pytest
+from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
 from app.core.database import async_session_maker, engine
 from app.core.settings import settings
+from app.main import app as fastapi_app
 from app.models.auth import User
 from app.models.base import Base
 
@@ -36,8 +39,34 @@ async def prepare_database():
         await session.commit()
 
 
+# @pytest.fixture(scope="session")
+# def event_loop(request):
+#     loop = asyncio.get_event_loop_policy().new_event_loop()
+#     yield loop
+#     loop.close()
+
+
+@pytest.fixture(scope="function")
+async def ac():
+    async with AsyncClient(
+        transport=ASGITransport(app=fastapi_app), base_url="http://test"
+    ) as ac:
+        yield ac
+
+
 @pytest.fixture(scope="session")
-def event_loop(request):
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+async def auth_ac():
+    async with AsyncClient(
+        transport=ASGITransport(app=fastapi_app), base_url="http://test"
+    ) as ac:
+        response = await ac.post(
+            "/api_v1/auth/users/login",
+            data={
+                "username": "user@example.com",
+                "password": "String03@",
+            },
+        )
+        access_token = response.json()["access_token"]
+        assert access_token
+        ac.headers["Authorization"] = f"Bearer {access_token}"
+        yield ac
