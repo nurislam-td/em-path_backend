@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
-from app.core.database import async_session_maker, engine
+from app.core.database import UnitOfWork, async_session_maker, engine
 from app.core.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import User
@@ -70,3 +70,8 @@ async def auth_ac():
         assert access_token
         ac.headers["Authorization"] = f"Bearer {access_token}"
         yield ac
+
+
+@pytest.fixture(scope="function")
+async def uow():
+    yield UnitOfWork(async_session_maker)
