@@ -26,6 +26,8 @@ openssl rsa -in refresh-private.pem -outform PEM -pubout -out refresh-public.pem
 
 **Get environment variable**
 
+---
+
 # Up database
 
 **install docker**
@@ -53,9 +55,27 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 **and run this command**
 
 ```shell
-sudo docker compose up --build
+sudo docker compose up --build -d
 # command should be running from docker-compose.yml directory
 ```
+
+---
+
+# Install python packages
+
+```shell
+pip install -r requirements.txt
+```
+
+---
+
+# Make alembic migration
+
+```shell
+alembic upgrade head
+```
+
+---
 
 # Run FastAPI application
 
