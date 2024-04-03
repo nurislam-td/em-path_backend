@@ -1,27 +1,31 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  test_db:
-    image: postgres:latest
-    container_name: test_db
+  test-db:
+    image: postgres:16.1
+    container_name: test-db
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: test_database
-      POSTGRES_USER: test_user
-      POSTGRES_PASSWORD: test_password
+      POSTGRES_USER: ${TEST_DB_USER}
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD}
+      POSTGRES_DB: ${TEST_DB_NAME}
     ports:
-      - "5433:5432"
+      - ${TEST_DB_PORT}:5432
     networks:
       - backend
 
   postgres-db:
     image: postgres:16.1
     container_name: postgres-db
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:5432
     networks:
       - backend
 
