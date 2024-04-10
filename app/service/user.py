@@ -8,14 +8,14 @@ from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUp
 from service import token
 
 
-async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserOut:
+async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserDTO:
     async with uow:
         is_exists = await uow.user.get_by_email(email=user_data.email)
         if is_exists:
             raise UserAlreadyExistsException
         user_dict = await uow.user.create(user_in=user_data)
         await uow.commit()
-        return UserOut.model_validate(user_dict)
+        return UserDTO(**user_dict)
 
 
 async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:

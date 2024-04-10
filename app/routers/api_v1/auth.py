@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 from uuid import UUID
 
@@ -25,8 +26,10 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 async def register_user(
     user_data: UserCreate,
     uow: IUnitOfWork = Depends(get_uow),
-) -> UserOut:
-    return await user.create_user(user_data, uow=uow)
+) -> TokenOut:
+    user_data = await user.create_user(user_data, uow=uow)
+    tokens = await user.login(user_data=user_data, uow=uow)
+    return tokens
 
 
 @router.post(

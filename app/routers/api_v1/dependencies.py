@@ -84,7 +84,7 @@ def get_token_payload(token: str = Depends(oauth2_scheme)) -> JWTPayload:
 async def get_current_user(
     payload: JWTPayload = Depends(get_token_payload),
     uow: IUnitOfWork = Depends(get_uow),
-):
+) -> UserDTO:
     async with uow:
         user_dict = await uow.user.get(id=payload.sub)
         return UserDTO.model_validate(user_dict)
