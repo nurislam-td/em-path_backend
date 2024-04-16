@@ -1,14 +1,14 @@
-import asyncio
 from typing import Annotated
 from uuid import UUID
 
-from core.database import IUnitOfWork
 from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 from pydantic import EmailStr
-from schemas.token import JWTPayload, TokenOut
-from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate
-from schemas.verify_code import VerifyCodeCheck
-from service import email, user
+
+from app.core.database import IUnitOfWork
+from app.schemas.token import JWTPayload, TokenOut
+from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
+from app.schemas.verify_code import VerifyCodeCheck
+from app.service import email, user
 
 from .dependencies import (
     get_current_user,

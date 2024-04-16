@@ -2,10 +2,11 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
-from core.database import IUnitOfWork
-from core.settings import settings
 from fastapi.encoders import jsonable_encoder
-from schemas.token import JWTPayload, TokenOut
+
+from app.core.database import IUnitOfWork
+from app.core.settings import settings
+from app.schemas.token import JWTPayload, TokenOut
 
 
 def encode_jwt(

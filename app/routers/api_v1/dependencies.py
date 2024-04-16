@@ -1,8 +1,5 @@
 from typing import Annotated
 
-from core.database import IUnitOfWork, UnitOfWork
-from core.exceptions import IncorrectCredentialsExceptions, InvalidToken
-from core.settings import settings
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import (
@@ -10,10 +7,14 @@ from jwt.exceptions import (
     InvalidSignatureError,
     InvalidTokenError,
 )
-from schemas.token import JWTPayload
-from schemas.user import UserDTO
-from service import secure
-from service.token import decode_jwt
+
+from app.core.database import IUnitOfWork, UnitOfWork
+from app.core.exceptions import IncorrectCredentialsExceptions, InvalidToken
+from app.core.settings import settings
+from app.schemas.token import JWTPayload
+from app.schemas.user import UserDTO
+from app.service import secure
+from app.service.token import decode_jwt
 
 
 def get_uow() -> IUnitOfWork:
