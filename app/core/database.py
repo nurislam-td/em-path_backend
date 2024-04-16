@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from core.settings import settings
-from repo.token import TokenRepo
-from repo.user import UserRepo
-from repo.verify_code import VerifyCodeRepo
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from app.core.settings import settings
+from app.repo.token import TokenRepo
+from app.repo.user import UserRepo
+from app.repo.verify_code import VerifyCodeRepo
 
 if settings.MODE == "DEV":
     DATABASE_URL = settings.db.url

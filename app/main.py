@@ -1,9 +1,44 @@
-import uvicorn
-from fastapi import FastAPI
-from routers.api_v1.api import api_router
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
+
+from app.core.exception_handler import (
+    app_exception_handler,
+    request_validation_exception_handler,
+)
+from app.core.exceptions import AppException
+from app.routers.api_v1.api import api_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(api_router)
+
+
+@app.exception_handler(RequestValidationError)
+async def custom_request_validation_error(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    return await request_validation_exception_handler(request=request, exc=exc)
+
+
+@app.exception_handler(AppException)
+async def custom_app_exception_handler(
+    request: Request, exc: AppException
+) -> JSONResponse:
+    return await app_exception_handler(request=request, exc=exc)
 
 
 @app.get("/")

@@ -1,29 +1,30 @@
-from fastapi import HTTPException, status
+from fastapi import status
 
 
-class AppException(HTTPException):
+class AppException(Exception):
     status_code = 500
-    detail = "Server error"
+    message = "Server error"
+    detail = []
 
-    def __init__(self):
-        super().__init__(status_code=self.status_code, detail=self.detail)
+    def __init__(self, detail: dict = None):
+        self.detail = [] if detail is None else detail
 
 
 class UserAlreadyExistsException(AppException):
     status_code = status.HTTP_409_CONFLICT
-    detail = "User already exist"
+    message = "User already exist"
 
 
 class IncorrectCredentialsExceptions(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = "Incorrect user credentials"
+    message = "Incorrect user credentials"
 
 
 class InvalidToken(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = "Invalid token"
+    message = "Invalid token"
 
 
 class IncorrectVerificationCode(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = "Incorrect verification code"
+    message = "Incorrect verification code"

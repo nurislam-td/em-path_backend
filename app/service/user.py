@@ -1,11 +1,11 @@
 from typing import Any
 from uuid import UUID
 
-from core.database import IUnitOfWork
-from core.exceptions import UserAlreadyExistsException
-from schemas.token import JWTPayload, TokenOut
-from schemas.user import UserCreate, UserDTO, UserOut, UserResetPassword, UserUpdate
-from service import token
+from app.core.database import IUnitOfWork
+from app.core.exceptions import UserAlreadyExistsException
+from app.schemas.token import JWTPayload, TokenOut
+from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
+from app.service import token
 
 
 async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserDTO:
