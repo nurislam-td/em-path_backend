@@ -44,6 +44,8 @@ class AuthJWT(BaseSettings):
 
     secure_cookies: bool = True
 
+    verification_code_expire: int = 5  # minutes
+
 
 class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
