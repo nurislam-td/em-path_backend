@@ -4,13 +4,9 @@ from typing import List
 from uuid import UUID
 
 from sqlalchemy import Enum, ForeignKey, String, func, text, types
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship,
-)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from app.models.base import Base
 
 
 class Sex(str, enum.Enum):
@@ -65,4 +61,7 @@ class VerifyCode(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(String(length=255))
     code: Mapped[str] = mapped_column(String(length=6))
-    is_active: Mapped[bool] = mapped_column()
+    is_active: Mapped[bool]
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), nullable=False
+    )

@@ -1,9 +1,9 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class VerifyOut(BaseModel):
     id: int
-    email: str
+    email: EmailStr
 
 
 class VerifyInDb(VerifyOut):
@@ -13,17 +13,17 @@ class VerifyInDb(VerifyOut):
 
 
 class VerifyCodeCreate(BaseModel):
-    email: str
+    email: EmailStr
     code: str
     is_active: bool = True
 
 
 class VerifyCodeCheck(BaseModel):
-    email: str
+    email: EmailStr
     code: str
 
 
 class VerifyCodeUpdate(VerifyCodeCreate):
-    email: str | None = None
+    email: EmailStr | None = None
     code: str | None = None
     is_active: bool | None = None

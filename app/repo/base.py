@@ -74,7 +74,7 @@ class SQLAlchemyRepo(AbstractRepo):
             .values(**values)
             .returning(self.model)
         )
-        return await self.fetch_one(query)
+        return await self.fetch_all(query)
 
     async def delete(self, filters: dict) -> None:
         query = delete(self.model.__table__).filter_by(**filters)

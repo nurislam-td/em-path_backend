@@ -1,14 +1,17 @@
 import os
+from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from smtplib import SMTP
 from ssl import create_default_context
 
-from core.database import IUnitOfWork
-from core.exceptions import IncorrectVerificationCode
 from dotenv import load_dotenv
 from pydantic import EmailStr
-from schemas.verify_code import VerifyCodeCheck, VerifyOut
-from service.secure import generate_random_num
+
+from app.core.database import IUnitOfWork
+from app.core.exceptions import IncorrectVerificationCode
+from app.core.settings import settings
+from app.schemas.verify_code import VerifyCodeCheck, VerifyOut
+from app.service.secure import generate_random_num
 
 load_dotenv()
 
@@ -44,6 +47,11 @@ async def send_verify_message(email: str, uow: IUnitOfWork) -> VerifyOut:
     message = f"This your verification code {email_code}"
     message = send_email_message([email], message=message)
     async with uow:
+        # TODO(fix) make it via celery or bacground task
+        await uow.verify_code.update(
+            values={"is_active": False}, filters={"email": email}
+        )
+        # end_todo
         verify_code_dict = await uow.verify_code.create(
             values={
                 "email": email,
@@ -52,15 +60,27 @@ async def send_verify_message(email: str, uow: IUnitOfWork) -> VerifyOut:
             }
         )
         await uow.commit()
-        return VerifyOut(id=verify_code_dict["id"], email=verify_code_dict["email"])
+        return VerifyOut(**verify_code_dict)
 
 
 async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
     async with uow:
-        code_dict = await uow.verify_code.get_by_email(email_in=code.email)
-        if code_dict and code.code == code_dict["code"]:
-            await uow.verify_code.delete(filters={"id": code_dict["id"]})
+        code_dict = await uow.verify_code.get_last_active_by_email(email_in=code.email)
+
+        if code_dict and code_dict["is_active"]:
+            expire_date = datetime.now() - timedelta(
+                minutes=settings.auth_config.verification_code_expire
+            )
+            # TODO(fix) make it via celery or bacground task
+            await uow.verify_code.update(
+                values={"is_active": False}, filters={"email": code_dict["email"]}
+            )
             await uow.commit()
-            return 200
-        else:
-            raise IncorrectVerificationCode
+            # end todo
+            if code_dict["created_at"] > expire_date and code.code == code_dict["code"]:
+                return 200
+
+        raise IncorrectVerificationCode
+
+
+# TODO(implement) delete all inactive verify message on 00:00 utc-0+
