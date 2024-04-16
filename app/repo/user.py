@@ -21,6 +21,4 @@ class UserRepo(SQLAlchemyRepo):
 
     async def reset_password(self, user_in: UserResetPassword, user_id: UUID):
         user_in.password = get_password_hash(user_in.password)
-        return await super().update(
-            filters={"id": user_id}, values=user_in.model_dump()
-        )
+        return await super().update_one(id=user_id, values=user_in.model_dump())

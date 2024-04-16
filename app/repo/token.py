@@ -14,9 +14,9 @@ class TokenRepo(SQLAlchemyRepo):
     async def saveToken(self, user_id, refresh_token):
         refresh_token_obj = await self.get_by_user_id(user_id=user_id)
         if refresh_token_obj:
-            return await self.update(
+            return await self.update_one(
                 values={"refresh_token": refresh_token},
-                filters={"id": refresh_token_obj["id"]},
+                id=refresh_token_obj["id"],
             )
         return await self.create(
             values={"user_id": user_id, "refresh_token": refresh_token}

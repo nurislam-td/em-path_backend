@@ -49,8 +49,8 @@ async def update_user(
     user_id: UUID, update_data: UserUpdate, uow: IUnitOfWork
 ) -> UserDTO:
     async with uow:
-        updated_user = await uow.user.update(
-            update_data.model_dump(exclude_unset=True), {"id": user_id}
+        updated_user = await uow.user.update_one(
+            update_data.model_dump(exclude_unset=True), id=user_id
         )
         await uow.commit()
         return UserDTO.model_validate(updated_user)

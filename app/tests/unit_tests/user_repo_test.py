@@ -62,8 +62,9 @@ async def test_get_user_by_email(email: str, uow: IUnitOfWork):
 )
 async def test_user_update(user_before, user_in, uow: IUnitOfWork):
     async with uow:
-        updated_user = await uow.user.update(
-            values=user_in, filters=dict(id=user_before["id"])
+        updated_user = await uow.user.update_one(
+            values=user_in,
+            id=user_before["id"],
         )
         await uow.commit()
         user_data = await uow.user.get(id=user_before["id"])

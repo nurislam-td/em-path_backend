@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import (
     Delete,
@@ -67,7 +68,7 @@ class SQLAlchemyRepo(AbstractRepo):
         query = select(self.model.__table__).filter_by(id=id)
         return await self.fetch_one(query)
 
-    async def update(self, values: dict, filters: dict) -> dict[str, Any]:
+    async def update(self, values: dict, filters: dict) -> list[dict[str, Any]]:
         query = (
             update(self.model.__table__)
             .filter_by(**filters)
@@ -75,6 +76,15 @@ class SQLAlchemyRepo(AbstractRepo):
             .returning(self.model)
         )
         return await self.fetch_all(query)
+
+    async def update_one(self, values: dict, id: UUID | int):
+        query = (
+            update(self.model.__table__)
+            .filter_by(id=id)
+            .values(**values)
+            .returning(self.model)
+        )
+        return await self.fetch_one(query)
 
     async def delete(self, filters: dict) -> None:
         query = delete(self.model.__table__).filter_by(**filters)
