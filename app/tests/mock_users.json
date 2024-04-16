@@ -2,8 +2,8 @@
     {
       "nickname": "string",
       "email": "userus@example.com",
-      "id": "32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7",
       "password": "$2b$12$pBXO3Qb8Q708eGJV3qyDCOMTwtK8I/2AI4xHzg7SsB8KEnPooWAly",
+      "id": "32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7",
       "sex": "unknown",
       "name": null,
       "lastname": null,

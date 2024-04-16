@@ -1,11 +1,12 @@
-import asyncio
 import json
+import os
+from typing import Any, AsyncGenerator
 
 import pytest
-from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
+os.environ["MODE"] = "TEST"
 from app.core.database import UnitOfWork, async_session_maker, engine
 from app.core.settings import settings
 from app.main import app as fastapi_app
@@ -14,8 +15,9 @@ from app.models.base import Base
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def prepare_database():
+async def prepare_database() -> None:
     assert settings.MODE == "TEST"
+    assert str(engine.url).endswith("test", -4)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -47,7 +49,7 @@ async def prepare_database():
 
 
 @pytest.fixture(scope="function")
-async def ac():
+async def ac() -> AsyncGenerator[AsyncClient, Any]:
     async with AsyncClient(
         transport=ASGITransport(app=fastapi_app), base_url="http://test"
     ) as ac:
@@ -55,23 +57,24 @@ async def ac():
 
 
 @pytest.fixture(scope="session")
-async def auth_ac():
+async def auth_ac() -> AsyncGenerator[AsyncClient, Any]:
     async with AsyncClient(
         transport=ASGITransport(app=fastapi_app), base_url="http://test"
-    ) as ac:
-        response = await ac.post(
+    ) as auth_ac:
+        response = await auth_ac.post(
             "/api_v1/auth/users/login",
             data={
                 "username": "user@example.com",
                 "password": "String03@",
             },
         )
-        access_token = response.json()["access_token"]
-        assert access_token
-        ac.headers["Authorization"] = f"Bearer {access_token}"
-        yield ac
+        response_data = response.json()
+        assert response_data["refresh_token"]
+        assert (access_token := response_data["access_token"])
+        auth_ac.headers["Authorization"] = f"Bearer {access_token}"
+        yield auth_ac
 
 
 @pytest.fixture(scope="function")
-async def uow():
+async def uow() -> AsyncGenerator[UnitOfWork, Any]:
     yield UnitOfWork(async_session_maker)
