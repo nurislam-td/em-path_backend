@@ -3,7 +3,15 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+    model_validator,
+)
 from pydantic_core import PydanticCustomError
 
 STRONG_PASSWORD_PATTERN = re.compile(
@@ -17,36 +25,10 @@ class Sex(str, Enum):
     unknown = "unknown"
 
 
-class UserOut(BaseModel):
-    nickname: str
-    email: EmailStr
+class UserLogin(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
-
-class UserCreate(UserOut):
-    password: str | bytes = Field(min_length=6, max_length=128)
-
-    @field_validator("password", mode="after")
-    @classmethod
-    def validate_password(cls, password: str) -> str:
-        if not re.match(STRONG_PASSWORD_PATTERN, password):
-            raise PydanticCustomError(
-                "value_error",
-                "Password must contain at least\
-                 one lower character,\
-                 one upper character,\
-                 digit and special symbol",
-                {
-                    "reason": "Password must contain at least\
-                               one lower character,\
-                               one upper character,\
-                               digit and special symbol",
-                },
-            )
-        return password
-
-
-class UserResetPassword(BaseModel):
-    email: EmailStr
+    email: EmailStr = Field(validation_alias=AliasChoices("email", "username"))
     password: str | bytes
 
     @field_validator("password", mode="after")
@@ -55,18 +37,20 @@ class UserResetPassword(BaseModel):
         if not re.match(STRONG_PASSWORD_PATTERN, password):
             raise PydanticCustomError(
                 "value_error",
-                "Password must contain at least\
-                 one lower character,\
-                 one upper character,\
-                 digit and special symbol",
+                "Password must contain at least one lower character, one upper character, digit and special symbol",
                 {
-                    "reason": "Password must contain at least\
-                               one lower character,\
-                               one upper character,\
-                               digit and special symbol",
+                    "reason": "Password must contain at least one lower character, one upper character, digit and special symbol",
                 },
             )
         return password
+
+
+class UserCreate(UserLogin):
+    nickname: str
+
+
+class UserResetPassword(UserLogin):
+    pass
 
 
 class UserUpdate(BaseModel):
@@ -92,9 +76,11 @@ class UserUpdate(BaseModel):
         return self
 
 
-class UserDTO(UserOut):
+class UserDTO(BaseModel):
     id: UUID
+    email: EmailStr
     password: bytes
+    nickname: str
     sex: Sex | None = Sex.unknown
     name: str | None = None
     lastname: str | None = None

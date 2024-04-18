@@ -28,6 +28,7 @@ services:
       - ${DB_PORT}:5432
     networks:
       - backend
+
   backend:
     container_name: diploma-backend
     env_file:
@@ -41,7 +42,7 @@ services:
       - postgres-db
       # - test-db
     environment:
-      - DB_HOST=postgres-db
+      DB_HOST: postgres-db
     # entrypoint: ["/docker/app.sh"]
     networks:
       - backend

@@ -1,18 +1,20 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import (
     ExpiredSignatureError,
     InvalidSignatureError,
     InvalidTokenError,
 )
+from pydantic import ValidationError
 
 from app.core.database import IUnitOfWork, UnitOfWork
 from app.core.exceptions import IncorrectCredentialsExceptions, InvalidToken
 from app.core.settings import settings
 from app.schemas.token import JWTPayload
-from app.schemas.user import UserDTO
+from app.schemas.user import UserDTO, UserLogin
 from app.service import secure
 from app.service.token import decode_jwt
 
@@ -27,16 +29,20 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def validate_auth_data(
-    user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     uow: IUnitOfWork = Depends(get_uow),
 ) -> UserDTO:
+    try:
+        user_credentials = UserLogin.model_validate(form_data)
+    except ValidationError as e:
+        raise RequestValidationError(e.errors())
     async with uow:
-        user_dict = await uow.user.get_by_email(user_credentials.username)
+        user_dict = await uow.user.get_by_email(user_credentials.email)
         if not user_dict:
             raise IncorrectCredentialsExceptions
         if not secure.verify_password(user_credentials.password, user_dict["password"]):
             raise IncorrectCredentialsExceptions
-        return UserDTO.model_validate(user_dict)
+        return UserDTO(**user_dict)
 
 
 def validate_refresh_token(refresh_token: str) -> JWTPayload:
