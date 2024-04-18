@@ -19,8 +19,8 @@ url = "/api_v1/auth"
 async def test_login_user(email, password, status_code, ac: AsyncClient):
     response = await ac.post(
         f"{url}/login",
-        data={
-            "username": email,
+        json={
+            "email": email,
             "password": password,
         },
     )

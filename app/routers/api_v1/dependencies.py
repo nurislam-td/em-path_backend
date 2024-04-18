@@ -29,13 +29,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 async def validate_auth_data(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    user_credentials: UserLogin,
     uow: IUnitOfWork = Depends(get_uow),
 ) -> UserDTO:
-    try:
-        user_credentials = UserLogin.model_validate(form_data)
-    except ValidationError as e:
-        raise RequestValidationError(e.errors())
     async with uow:
         user_dict = await uow.user.get_by_email(user_credentials.email)
         if not user_dict:
