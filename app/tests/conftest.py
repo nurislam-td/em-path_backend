@@ -62,7 +62,7 @@ async def auth_ac() -> AsyncGenerator[AsyncClient, Any]:
         transport=ASGITransport(app=fastapi_app), base_url="http://test"
     ) as auth_ac:
         response = await auth_ac.post(
-            "/api_v1/auth/users/login",
+            "/api_v1/auth/login",
             data={
                 "username": "user@example.com",
                 "password": "String03@",

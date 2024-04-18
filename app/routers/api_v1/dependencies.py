@@ -24,7 +24,7 @@ def get_uow() -> IUnitOfWork:
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api_v1/auth/users/login",
+    tokenUrl="/api_v1/auth/login",
 )
 
 
