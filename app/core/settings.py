@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).parent.parent.parent
 
@@ -30,6 +30,8 @@ class DbSettings(BaseSettings):
 
     # echo: bool = False
     echo: bool = True
+
+    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
 
 
 class AuthJWT(BaseSettings):
