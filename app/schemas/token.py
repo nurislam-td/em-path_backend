@@ -1,6 +1,15 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel
+
+
+class TokenDTO(BaseModel):
+    id: UUID
+    user_id: UUID
+    refresh_token: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class JWTPayload(BaseModel):
@@ -11,22 +20,3 @@ class JWTPayload(BaseModel):
 class TokenOut(BaseModel):
     access_token: str
     refresh_token: str
-
-
-class RefreshTokenCreate(BaseModel):
-    user_id: str
-    refresh_token: str
-    expires_at: str
-
-
-class RefreshTokenUpdate(BaseModel):
-    refresh_token: str
-
-
-class RefreshTokenInDB(BaseModel):
-    id: str
-    user_id: str
-    refresh_token: str
-    expires_at: str
-    created_at: str
-    updated_at: str

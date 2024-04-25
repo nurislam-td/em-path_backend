@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 from pydantic import EmailStr
 
-from app.core.database import IUnitOfWork
+from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
@@ -25,7 +25,7 @@ async def login(
     return tokens
 
 
-@router.post("/email", status_code=status.HTTP_200_OK)
+@router.post("/email", status_code=status.HTTP_202_ACCEPTED)
 async def send_verify_message(
     background_tasks: BackgroundTasks,
     email_in: EmailStr,

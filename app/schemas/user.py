@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import date
 from enum import Enum
 from uuid import UUID
 
@@ -29,7 +29,7 @@ class UserLogin(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     email: EmailStr = Field(validation_alias=AliasChoices("email", "username"))
-    password: str | bytes
+    password: str | bytes = Field(examples=["String03@"])
 
     @field_validator("password", mode="after")
     @classmethod
@@ -60,7 +60,7 @@ class UserUpdate(BaseModel):
     name: str | None = None
     lastname: str | None = None
     patronymic: str | None = None
-    date_birth: str | None = None
+    date_birth: date | None = None
     image: str | None = None
 
     @model_validator(mode="after")
@@ -85,5 +85,5 @@ class UserDTO(BaseModel):
     name: str | None = None
     lastname: str | None = None
     patronymic: str | None = None
-    date_birth: datetime | None = None
+    date_birth: date | None = None
     image: str | None = None

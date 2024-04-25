@@ -7,11 +7,12 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
 os.environ["MODE"] = "TEST"
-from app.core.database import UnitOfWork, async_session_maker, engine
+from app.core.database import async_session_maker, engine
 from app.core.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import User
 from app.models.base import Base
+from app.repo.unit_of_work import UnitOfWork
 
 
 @pytest.fixture(scope="session", autouse=True)

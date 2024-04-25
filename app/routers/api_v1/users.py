@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from app.core.database import IUnitOfWork
+from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserUpdate
 from app.service import user

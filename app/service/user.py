@@ -1,8 +1,7 @@
-from typing import Any
 from uuid import UUID
 
-from app.core.database import IUnitOfWork
 from app.core.exceptions import UserAlreadyExistsException
+from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
 from app.service import token
@@ -10,12 +9,11 @@ from app.service import token
 
 async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserDTO:
     async with uow:
-        is_exists = await uow.user.get_by_email(email=user_data.email)
-        if is_exists:
+        if await uow.user.get_by_email(email=user_data.email):
             raise UserAlreadyExistsException
-        user_dict = await uow.user.create(user_in=user_data)
+        user_dto: UserDTO = await uow.user.create(user_in=user_data)
         await uow.commit()
-        return UserDTO(**user_dict)
+        return user_dto
 
 
 async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:
@@ -37,23 +35,25 @@ async def refresh_tokens(jwt_payload: JWTPayload, uow: IUnitOfWork) -> TokenOut:
 
 async def reset_password(update_data: UserResetPassword, uow: IUnitOfWork) -> UserDTO:
     async with uow:
-        user_dict: dict[str, Any] = await uow.user.get_by_email(email=update_data.email)
-        updated_user = await uow.user.reset_password(
-            user_in=update_data, user_id=user_dict.get("id")
+        user_dto: UserDTO = await uow.user.get_by_email(email=update_data.email)
+        if not user_dto:
+            raise Exception  # TODO UserNotExists
+        updated_user: UserDTO = await uow.user.reset_password(
+            user_in=update_data, user_id=user_dto.id
         )
         await uow.commit()
-        return UserDTO.model_validate(updated_user)
+        return updated_user
 
 
 async def update_user(
     user_id: UUID, update_data: UserUpdate, uow: IUnitOfWork
 ) -> UserDTO:
     async with uow:
-        updated_user = await uow.user.update_one(
-            update_data.model_dump(exclude_unset=True), id=user_id
+        updated_user: UserDTO = await uow.user.update_one(
+            update_data.model_dump(exclude_unset=True), pk=user_id
         )
         await uow.commit()
-        return UserDTO.model_validate(updated_user)
+        return updated_user
 
 
 async def delete_user(user_id: UUID, uow: IUnitOfWork):
@@ -62,7 +62,7 @@ async def delete_user(user_id: UUID, uow: IUnitOfWork):
         await uow.commit()
 
 
-async def get_all(uow: IUnitOfWork) -> list[UserDTO]:
+async def get_all(uow: IUnitOfWork) -> list[UserDTO] | None:
     async with uow:
-        users_list = await uow.user.get_all()
-        return [UserDTO.model_validate(user_dict) for user_dict in users_list]
+        users_list: list[UserDTO] | None = await uow.user.get_all()
+        return users_list

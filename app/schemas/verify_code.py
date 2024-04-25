@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -6,10 +8,13 @@ class VerifyOut(BaseModel):
     email: EmailStr
 
 
-class VerifyInDb(VerifyOut):
+class VerifyCodeDTO(VerifyOut):
     model_config = ConfigDict(from_attributes=True)
+    id: int
+    email: str
     code: str
     is_active: bool
+    created_at: datetime
 
 
 class VerifyCodeCreate(BaseModel):

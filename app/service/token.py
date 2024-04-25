@@ -4,8 +4,8 @@ from typing import Any
 import jwt
 from fastapi.encoders import jsonable_encoder
 
-from app.core.database import IUnitOfWork
 from app.core.settings import settings
+from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 
 

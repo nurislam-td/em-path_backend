@@ -25,7 +25,7 @@ async def request_validation_exception_handler(
     errors = exc.errors()
     try:
         message = errors[0]["ctx"]["reason"]
-    except KeyError as e:
+    except KeyError:
         message = errors[0]["msg"]
     return JSONResponse(
         status_code=422,
