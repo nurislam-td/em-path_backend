@@ -1,4 +1,4 @@
-from sqlalchemy import NullPool
+from sqlalchemy import NullPool, create_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.settings import settings
@@ -11,7 +11,9 @@ else:
     DATABASE_PARAMS = {"poolclass": NullPool}
 
 
-engine = create_async_engine(DATABASE_URL, **DATABASE_PARAMS)
+async_engine = create_async_engine(DATABASE_URL, **DATABASE_PARAMS)
 async_session_maker = async_sessionmaker(
-    engine, autoflush=False, expire_on_commit=False
+    async_engine, autoflush=False, expire_on_commit=False
 )
+
+engine = create_engine(settings.db.sync_url, **DATABASE_PARAMS)

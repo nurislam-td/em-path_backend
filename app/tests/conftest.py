@@ -7,7 +7,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
 os.environ["MODE"] = "TEST"
-from app.core.database import async_session_maker, engine
+from app.core.database import async_engine, async_session_maker
 from app.core.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import User
@@ -18,8 +18,8 @@ from app.repo.unit_of_work import UnitOfWork
 @pytest.fixture(scope="session", autouse=True)
 async def prepare_database() -> None:
     assert settings.MODE == "TEST"
-    assert str(engine.url).endswith("test", -4)
-    async with engine.begin() as conn:
+    assert str(async_engine.url).endswith("test", -4)
+    async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 

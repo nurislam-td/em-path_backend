@@ -10,8 +10,8 @@ from pydantic import EmailStr
 from app.core.exceptions import IncorrectVerificationCode
 from app.core.settings import settings
 from app.interfaces.unit_of_work import IUnitOfWork
-from app.schemas.verify_code import VerifyCodeCheck, VerifyCodeDTO, VerifyOut
-from app.service.secure import generate_random_num
+from app.schemas.verify_code import VerifyCodeCheck, VerifyCodeDTO
+from app.tasks import tasks
 
 load_dotenv()
 
@@ -42,28 +42,8 @@ def send_email_message(emails: list[EmailStr], message) -> MIMEText:
         return {"error": e}
 
 
-async def send_verify_message(email: str, uow: IUnitOfWork) -> VerifyOut:
-    email_code = generate_random_num()
-    message = f"This your verification code {email_code}"
-    message = send_email_message([email], message=message)
-    async with uow:
-        # TODO(fix) make it via celery or bacground task
-        await uow.verify_code.update(
-            values={"is_active": False}, filters={"email": email}
-        )
-        # end_todo
-        verify_code_dto: VerifyCodeDTO = await uow.verify_code.create(
-            values={
-                "email": email,
-                "code": email_code,
-                "is_active": True,
-            }
-        )
-        await uow.commit()
-        return VerifyOut(**verify_code_dto.model_dump())
-
-
 async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
+
     async with uow:
         code_dto: VerifyCodeDTO = await uow.verify_code.get_last_active_by_email(
             email_in=code.email
@@ -73,13 +53,8 @@ async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
             expire_date = datetime.now() - timedelta(
                 minutes=settings.auth_config.verification_code_expire
             )
-            # TODO(fix) make it via celery or bacground task
-            await uow.verify_code.update(
-                values={"is_active": False}, filters={"email": code_dto.email}
-            )
-            await uow.commit()
-            # end todo
             if code_dto.created_at > expire_date and code.code == code_dto.code:
+                tasks.deactivate_verify_code.delay(code_dto.email)
                 return 200
 
         raise IncorrectVerificationCode

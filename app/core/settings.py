@@ -7,7 +7,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BASE_DIR = Path(__file__).parent.parent.parent
 
 
-class DbSettings(BaseSettings):
+class CustomBaseSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+
+class DbSettings(CustomBaseSettings):
     user: str = Field(alias="DB_USER")
     password: str = Field(alias="DB_PASSWORD")
     host: str = Field(alias="DB_HOST")
@@ -25,16 +29,30 @@ class DbSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
 
     @property
+    def sync_url(self) -> str:
+        return f"postgresql+psycopg://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
+
+    @property
     def test_url(self) -> str:
         return f"postgresql+asyncpg://{self.test_user}:{self.test_password}@{self.test_host}:{self.test_port}/{self.test_dbname}"
 
     # echo: bool = False
     echo: bool = True
 
-    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
-class AuthJWT(BaseSettings):
+class RedisSettings(CustomBaseSettings):
+    port: str = Field(alias="REDIS_PORT")
+    host: str = Field(alias="REDIS_HOST")
+    prefix: str = "fastapi-cache"
+
+    @property
+    def url(self) -> str:
+        return f"redis://{self.host}:{self.port}"
+
+
+class AuthJWT(CustomBaseSettings):
     jwt_alg: str = "RS256"
     access_private_path: Path = BASE_DIR / "certs" / "access-private.pem"
     access_public_path: Path = BASE_DIR / "certs" / "access-public.pem"
@@ -49,10 +67,13 @@ class AuthJWT(BaseSettings):
     verification_code_expire: int = 5  # minutes
 
 
-class Settings(BaseSettings):
+class Settings(CustomBaseSettings):
+
     api_v1_prefix: str = "/api/v1"
 
     db: DbSettings = DbSettings()
+
+    redis: RedisSettings = RedisSettings()
 
     auth_config: AuthJWT = AuthJWT()
 

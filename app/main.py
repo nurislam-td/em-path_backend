@@ -13,13 +13,14 @@ from app.core.exception_handler import (
     request_validation_exception_handler,
 )
 from app.core.exceptions import AppException
+from app.core.settings import settings
 from app.routers.api_v1.api import api_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis = aioredis.from_url("redis://localhost")
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    redis = aioredis.from_url(settings.redis.url)
+    FastAPICache.init(RedisBackend(redis), prefix=settings.redis.prefix)
     yield
 
 

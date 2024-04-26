@@ -8,7 +8,7 @@ from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import email, user
-
+from app.tasks import tasks
 from .dependencies import get_uow, validate_auth_data, validate_refresh_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -27,11 +27,9 @@ async def login(
 
 @router.post("/email", status_code=status.HTTP_202_ACCEPTED)
 async def send_verify_message(
-    background_tasks: BackgroundTasks,
     email_in: EmailStr,
-    uow: IUnitOfWork = Depends(get_uow),
 ) -> dict[str, str]:
-    background_tasks.add_task(email.send_verify_message, email_in, uow)
+    tasks.send_verify_message.delay(email_in)
     return {"status": "202", "message": "mail has been sended"}
 
 
