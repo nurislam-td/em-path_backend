@@ -10,7 +10,11 @@ from jwt.exceptions import (
     InvalidTokenError,
 )
 
-from app.core.exceptions import IncorrectCredentialsExceptions, InvalidToken
+from app.core.exceptions import (
+    IncorrectCredentialsExceptions,
+    InvalidToken,
+    UserNotExistsException,
+)
 from app.core.settings import settings
 from app.interfaces.unit_of_work import IUnitOfWork
 from app.repo.unit_of_work import UnitOfWork
@@ -97,6 +101,4 @@ async def get_current_user(
         user_dto: UserDTO = await uow.user.get(pk=payload.sub)
         if user_dto:
             return user_dto
-        raise HTTPException(
-            status_code=400, detail={"msg": "user not exists"}
-        )  # TODO usernotexist
+        raise UserNotExistsException

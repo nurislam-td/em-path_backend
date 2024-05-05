@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.core.exceptions import UserAlreadyExistsException
+from app.core.exceptions import UserAlreadyExistsException, UserNotExistsException
 from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
@@ -37,7 +37,7 @@ async def reset_password(update_data: UserResetPassword, uow: IUnitOfWork) -> Us
     async with uow:
         user_dto: UserDTO = await uow.user.get_by_email(email=update_data.email)
         if not user_dto:
-            raise Exception  # TODO UserNotExists
+            raise UserNotExistsException
         updated_user: UserDTO = await uow.user.reset_password(
             user_in=update_data, user_id=user_dto.id
         )
