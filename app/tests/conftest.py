@@ -11,7 +11,7 @@ os.environ["MODE"] = "TEST"
 from app.core.database import async_engine, async_session_maker
 from app.core.settings import settings
 from app.main import app as fastapi_app
-from app.models.auth import RefreshToken, User
+from app.models.auth import RefreshToken, User, VerifyCode
 from app.models.base import Base
 from app.repo.unit_of_work import UnitOfWork
 
@@ -31,23 +31,24 @@ async def prepare_database() -> None:
     users = open_mock_json("users")
     for user in users:
         user["password"] = bytes(user["password"], "utf-8")
+
     tokens = open_mock_json("tokens")
     for token in tokens:
-        token["created_at"] = datetime.strptime(
-            token["created_at"], "%Y-%m-%d %H:%M:%S"
-        )
-        token["updated_at"] = datetime.strptime(
-            token["updated_at"], "%Y-%m-%d %H:%M:%S"
-        )
-    # verify_codes = open_mock_json("verify_codes")
+        token["created_at"] = datetime.now()
+        token["updated_at"] = datetime.now()
+
+    verify_codes = open_mock_json("verify_codes")
+    for verify_code in verify_codes:
+        verify_code["created_at"] = datetime.now()
+
     async with async_session_maker() as session:
         add_users = insert(User).values(users)
         add_tokens = insert(RefreshToken).values(tokens)
-        # add_verify_codes = insert(VerifyCode).values(verify_codes)
+        add_verify_codes = insert(VerifyCode).values(verify_codes)
 
         await session.execute(add_users)
         await session.execute(add_tokens)
-        # await session.execute(add_verify_codes)
+        await session.execute(add_verify_codes)
 
         await session.commit()
 

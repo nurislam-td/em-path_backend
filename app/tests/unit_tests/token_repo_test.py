@@ -18,8 +18,10 @@ async def test_save_token(uow: IUnitOfWork):
         refresh_token_dto: TokenDTO = await uow.token.save_token(
             user_id=user_id, refresh_token="refresh_token"
         )
+        await uow.commit()
         assert await uow.token.get_by_user_id(user_id=user_id) == refresh_token_dto
         refresh_token_updated = await uow.token.save_token(
             user_id=user_id, refresh_token="refresh_token_updated"
         )
+        await uow.commit()
         assert await uow.token.get_by_user_id(user_id=user_id) == refresh_token_updated

@@ -58,15 +58,6 @@ class SQLAlchemyRepo(ISQLRepo[DTOSchema, DBModel]):
         query = insert(self._table).values(**values).returning(self._model)
         return await self.fetch_one(query)
 
-    async def foo(
-        self,
-        bar: dict,
-        bar2,
-        bar12,
-        bar123,
-    ) -> DTOSchema | None:
-        pass
-
     @override
     async def get_all(self, **kwargs) -> list[DTOSchema] | None:
         query = select(self._table).filter_by(**kwargs)
@@ -81,8 +72,8 @@ class SQLAlchemyRepo(ISQLRepo[DTOSchema, DBModel]):
     async def update(self, values: dict, filters: dict) -> list[DTOSchema] | None:
         query = (
             update(self._table)
-            .filter_by(**filters)
             .values(**values)
+            .filter_by(**filters)
             .returning(self._model)
         )
         return await self.fetch_all(query)
