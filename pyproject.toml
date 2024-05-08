@@ -38,6 +38,7 @@ flower = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.7"
+black = "^24.4.2"
 
 
 [build-system]

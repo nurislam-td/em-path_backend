@@ -20,7 +20,7 @@ async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:
     jwt_data = JWTPayload(sub=user_data.id, email=user_data.email)
     access_token, refresh_token = token.generate_tokens(jwt_payload=jwt_data)
     async with uow:
-        await uow.token.saveToken(jwt_data.sub, refresh_token)
+        await uow.token.save_token(jwt_data.sub, refresh_token)
         await uow.commit()
         return TokenOut(access_token=access_token, refresh_token=refresh_token)
 
@@ -28,7 +28,7 @@ async def login(user_data: UserDTO, uow: IUnitOfWork) -> TokenOut:
 async def refresh_tokens(jwt_payload: JWTPayload, uow: IUnitOfWork) -> TokenOut:
     access_token, refresh_token = token.generate_tokens(jwt_payload=jwt_payload)
     async with uow:
-        await uow.token.saveToken(jwt_payload.sub, refresh_token)
+        await uow.token.save_token(jwt_payload.sub, refresh_token)
         await uow.commit()
         return TokenOut(access_token=access_token, refresh_token=refresh_token)
 

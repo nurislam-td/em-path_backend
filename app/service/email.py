@@ -21,7 +21,7 @@ MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 MAIL_PORT = os.environ.get("MAIL_PORT", 587)
 
 
-def send_email_message(emails: list[EmailStr], message) -> MIMEText:
+def send_email_message(emails: list[EmailStr], message) -> MIMEText | dict:
     body = message
     message = MIMEText(body)
     message["From"] = MAIL_USERNAME
@@ -42,8 +42,7 @@ def send_email_message(emails: list[EmailStr], message) -> MIMEText:
         return {"error": e}
 
 
-async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
-
+async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> int:
     async with uow:
         code_dto: VerifyCodeDTO = await uow.verify_code.get_last_active_by_email(
             email_in=code.email
@@ -58,6 +57,3 @@ async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> None:
                 return 200
 
         raise IncorrectVerificationCode
-
-
-# TODO(implement) delete all inactive verify message on 00:00 utc-0+

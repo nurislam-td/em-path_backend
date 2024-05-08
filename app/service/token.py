@@ -60,6 +60,6 @@ async def get_tokens(payload: dict[str, Any], uow: IUnitOfWork):
     jwt_data = JWTPayload(sub=payload["sub"], email=payload["email"])
     access_token, refresh_token = generate_tokens(jwt_payload=jwt_data)
     async with uow:
-        await uow.token.saveToken(jwt_data.sub, refresh_token)
+        await uow.token.save_token(jwt_data.sub, refresh_token)
         await uow.commit()
         return TokenOut(access_token=access_token, refresh_token=refresh_token)

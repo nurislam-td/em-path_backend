@@ -5,12 +5,12 @@ from app.interfaces.repo import ISQLTokenRepo, ISQLUserRepo, ISQLVerifyCodeRepo
 
 
 class IUnitOfWork(ABC):
-    user: Type[ISQLUserRepo]
-    token: Type[ISQLTokenRepo]
-    verify_code: Type[ISQLVerifyCodeRepo]
+    user: ISQLUserRepo
+    token: ISQLTokenRepo
+    verify_code: ISQLVerifyCodeRepo
 
     @abstractmethod
-    async def __init__(self): ...
+    def __init__(self): ...
 
     @abstractmethod
     async def __call__(self): ...

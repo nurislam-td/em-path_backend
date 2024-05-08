@@ -2,20 +2,21 @@ from typing import override
 
 from sqlalchemy import select
 
+from app.interfaces.repo import ISQLTokenRepo
 from app.models.auth import RefreshToken
 from app.repo.base import SQLAlchemyRepo
 from app.schemas.token import TokenDTO
 
 
-class TokenRepo(SQLAlchemyRepo[TokenDTO, RefreshToken]):
+class TokenRepo(SQLAlchemyRepo[TokenDTO, RefreshToken], ISQLTokenRepo):
 
     @override
     async def get_by_user_id(self, user_id) -> TokenDTO:
-        query = select(self._model.__table__).filter_by(user_id=user_id)
+        query = select(self._table).filter_by(user_id=user_id)
         return await self.fetch_one(query)
 
     @override
-    async def saveToken(self, user_id, refresh_token) -> TokenDTO:
+    async def save_token(self, user_id, refresh_token) -> TokenDTO:
         refresh_token_dto: TokenDTO = await self.get_by_user_id(user_id=user_id)
         if refresh_token_dto:
             return await self.update_one(

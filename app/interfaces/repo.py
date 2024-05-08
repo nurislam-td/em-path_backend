@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from abc import abstractmethod
+from typing import Generic, Type, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
@@ -14,29 +14,11 @@ DTOSchema = TypeVar("DTOSchema", bound=BaseModel)
 DBModel = TypeVar("DBModel", bound=DeclarativeBase)
 
 
-class IRepo(ABC):
+class ISQLRepo(Generic[DTOSchema, DBModel]):
     @abstractmethod
-    async def create(self) -> DTOSchema: ...
-
-    @abstractmethod
-    async def get_all(self) -> list[DTOSchema]: ...
-
-    @abstractmethod
-    async def get(self) -> DTOSchema: ...
-
-    @abstractmethod
-    async def update(self) -> list[DTOSchema]: ...
-
-    @abstractmethod
-    async def update_one(self) -> DTOSchema: ...
-
-    @abstractmethod
-    async def delete(self) -> None: ...
-
-
-class ISQLRepo(IRepo, Generic[DTOSchema, DBModel]):
-    @abstractmethod
-    def __init__(self, session, schema: DTOSchema, model: DBModel) -> None: ...
+    def __init__(
+        self, session, schema: Type[DTOSchema], model: Type[DBModel]
+    ) -> None: ...
 
     @abstractmethod
     async def create(self, values: dict) -> DTOSchema | None: ...
@@ -58,12 +40,13 @@ class ISQLRepo(IRepo, Generic[DTOSchema, DBModel]):
 
 
 class ISQLTokenRepo(ISQLRepo[TokenDTO, RefreshToken]):
-
     @abstractmethod
     async def get_by_user_id(self, user_id: UUID) -> TokenDTO | None: ...
 
     @abstractmethod
-    async def saveToken(self, user_id: UUID, refresh_token: str) -> TokenDTO | None: ...
+    async def save_token(
+        self, user_id: UUID, refresh_token: str
+    ) -> TokenDTO | None: ...
 
 
 class ISQLUserRepo(ISQLRepo[UserDTO, User]):
@@ -82,5 +65,5 @@ class ISQLUserRepo(ISQLRepo[UserDTO, User]):
 class ISQLVerifyCodeRepo(ISQLRepo[VerifyCodeDTO, VerifyCode]):
     @abstractmethod
     async def get_last_active_by_email(
-        self, email: EmailStr
+        self, email_in: EmailStr
     ) -> VerifyCodeDTO | None: ...
