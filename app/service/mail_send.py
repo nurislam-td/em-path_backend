@@ -53,7 +53,8 @@ async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> int:
                 minutes=settings.auth_config.verification_code_expire
             )
             if code_dto.created_at > expire_date and code.code == code_dto.code:
-                tasks.deactivate_verify_code.delay(code_dto.email)
+                if settings.MODE != "TEST":
+                    tasks.deactivate_verify_code.delay(code_dto.email)
                 return 200
 
         raise IncorrectVerificationCode

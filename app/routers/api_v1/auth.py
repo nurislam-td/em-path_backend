@@ -1,14 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from pydantic import EmailStr
 
 from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
-from app.service import email, user
+from app.service import mail_send, user
 from app.tasks import tasks
+
 from .dependencies import get_uow, validate_auth_data, validate_refresh_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -37,7 +38,7 @@ async def send_verify_message(
 async def verify_code(
     code: VerifyCodeCheck, uow: IUnitOfWork = Depends(get_uow)
 ) -> bool:
-    await email.check_code(code, uow=uow)
+    await mail_send.check_code(code, uow=uow)
     return True
 
 

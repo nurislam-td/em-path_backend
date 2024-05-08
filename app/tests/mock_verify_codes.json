@@ -5,5 +5,12 @@
     "code": "718229",
     "is_active": true,
     "created_at": "datetime.now() in conftest"
+  },
+  {
+    "id": 2,
+    "email": "mail_send_service@example.com",
+    "code": "777777",
+    "is_active": true,
+    "created_at": "datetime.now() in conftest"
   }
 ]

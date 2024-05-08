@@ -12,7 +12,7 @@ def get_password_hash(password: str) -> bytes:
     return bcrypt.hashpw(password, salt)
 
 
-def verify_password(password: str, hash_password) -> bool:
+def verify_password(password: str, hash_password: str | bytes) -> bool:
     return bcrypt.checkpw(password=password.encode(), hashed_password=hash_password)
 
 

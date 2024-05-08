@@ -7,7 +7,7 @@ from sqlalchemy import TableClause, delete, insert, update
 from app.core.database import engine
 from app.core.settings import settings
 from app.models.auth import VerifyCode
-from app.service import email, secure
+from app.service import mail_send, secure
 
 
 @shared_task
@@ -21,7 +21,7 @@ def deactivate_verify_code(email_in: str):
 def send_verify_message(email_in: str):
     email_code = secure.generate_random_num()
     message = f"This your verification code {email_code}"
-    message = email.send_email_message([email_in], message=message)
+    message = mail_send.send_email_message([email_in], message=message)
     with engine.begin() as conn:
         table = cast(TableClause, VerifyCode.__table__)
         conn.execute(update(table).values(is_active=False).filter_by(email=email_in))
