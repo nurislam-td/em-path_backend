@@ -1,23 +1,23 @@
 from datetime import UTC, datetime, timedelta
 from typing import cast
 
-from celery import shared_task
 from sqlalchemy import TableClause, delete, insert, update
 
 from app.core.database import engine
 from app.core.settings import settings
 from app.models.auth import VerifyCode
 from app.service import mail_send, secure
+from app.tasks.celery_app import celery_app
 
 
-@shared_task
+@celery_app.task()
 def deactivate_verify_code(email_in: str):
     with engine.begin() as conn:
         table = cast(TableClause, VerifyCode.__table__)
         conn.execute(update(table).values(is_active=False).filter_by(email=email_in))
 
 
-@shared_task
+@celery_app.task()
 def send_verify_message(email_in: str):
     email_code = secure.generate_random_num()
     message = f"This your verification code {email_code}"
@@ -30,7 +30,7 @@ def send_verify_message(email_in: str):
         )
 
 
-@shared_task(name="clean_verify_code_table")
+@celery_app.task(name="clean_verify_code_table")
 def clean_verify_code_table():
     with engine.begin() as conn:
         table = cast(TableClause, VerifyCode.__table__)
