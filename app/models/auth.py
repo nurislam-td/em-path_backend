@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from sqlalchemy import Enum, ForeignKey, String, func, text, types
+from sqlalchemy import Enum, ForeignKey, String, text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -49,10 +49,11 @@ class RefreshToken(Base):
     user: Mapped["User"] = relationship(back_populates="refresh_token")
     refresh_token: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        server_default=text("(now() at time zone 'utc')"), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
+        server_default=text("(now() at time zone 'utc')"),
+        onupdate=text("(now() at time zone 'utc')"),
     )
 
 
@@ -63,5 +64,5 @@ class VerifyCode(Base):
     code: Mapped[str] = mapped_column(String(length=6))
     is_active: Mapped[bool]
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), nullable=False
+        server_default=text("(now() at time zone 'utc')"), nullable=False
     )
