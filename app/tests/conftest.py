@@ -7,6 +7,9 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
+from app.interfaces.task_manager import ITaskManager
+
+# TODO refactor this import
 os.environ["MODE"] = "TEST"
 from app.core.database import async_engine, async_session_maker
 from app.core.settings import settings
@@ -58,6 +61,7 @@ async def prepare_database() -> None:
 #     loop = asyncio.get_event_loop_policy().new_event_loop()
 #     yield loop
 #     loop.close()
+# TODO watch this event loop
 
 
 @pytest.fixture(scope="function")
@@ -90,3 +94,24 @@ async def auth_ac() -> AsyncGenerator[AsyncClient, Any]:
 @pytest.fixture(scope="function")
 async def uow() -> AsyncGenerator[UnitOfWork, Any]:
     yield UnitOfWork(async_session_maker)
+
+
+# TODO add "celery" task test
+# TODO optimize mock json files
+# TODO learn test mocking
+
+
+class TestTaskManager(ITaskManager):
+    def send_verify_message(self, email_in: str):
+        return bool(self and email_in)
+
+    def deactivate_verify_code(self, email_in: str):
+        return bool(self and email_in)
+
+    def clean_verify_code_table(self):
+        return bool(self)
+
+
+@pytest.fixture
+def task_manager() -> ITaskManager:
+    return TestTaskManager()

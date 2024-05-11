@@ -5,6 +5,7 @@ from sqlalchemy import TableClause, delete, insert, update
 
 from app.core.database import engine
 from app.core.settings import settings
+from app.interfaces.task_manager import ITaskManager
 from app.models.auth import VerifyCode
 from app.service import mail_send, secure
 from app.tasks.celery_app import celery_app
@@ -38,3 +39,14 @@ def clean_verify_code_table():
             minutes=settings.auth_config.verification_code_expire
         )
         conn.execute(delete(table).where(table.c.created_at < time_filter))
+
+
+class CeleryTaskManager(ITaskManager):
+    def send_verify_message(self, email_in: str):
+        send_verify_message.delay(email_in)
+
+    def deactivate_verify_code(self, email_in: str):
+        deactivate_verify_code.delay(email_in)
+
+    def clean_verify_code_table(self):
+        clean_verify_code_table.delay()

@@ -16,16 +16,22 @@ from app.core.exceptions import (
     UserNotExistsException,
 )
 from app.core.settings import settings
+from app.interfaces.task_manager import ITaskManager
 from app.interfaces.unit_of_work import IUnitOfWork
 from app.repo.unit_of_work import UnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserDTO, UserLogin
 from app.service import secure
 from app.service.token import decode_jwt
+from app.tasks.tasks import CeleryTaskManager
 
 
 def get_uow() -> IUnitOfWork:
     return UnitOfWork()
+
+
+def get_task_manager() -> ITaskManager:
+    return CeleryTaskManager()
 
 
 oauth2_scheme = OAuth2PasswordBearer(

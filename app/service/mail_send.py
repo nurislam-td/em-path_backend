@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from email.mime.text import MIMEText
 from smtplib import SMTP
 from ssl import create_default_context
@@ -9,9 +9,9 @@ from pydantic import EmailStr
 
 from app.core.exceptions import IncorrectVerificationCode
 from app.core.settings import settings
+from app.interfaces.task_manager import ITaskManager
 from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.verify_code import VerifyCodeCheck, VerifyCodeDTO
-from app.tasks import tasks
 
 load_dotenv()
 
@@ -22,6 +22,7 @@ MAIL_PORT = os.environ.get("MAIL_PORT", 587)
 
 
 def send_email_message(emails: list[EmailStr], message) -> MIMEText | dict:
+    # TODO send jinja html template instead raw text
     body = message
     message = MIMEText(body)
     message["From"] = MAIL_USERNAME
@@ -42,19 +43,23 @@ def send_email_message(emails: list[EmailStr], message) -> MIMEText | dict:
         return {"error": e}
 
 
-async def check_code(code: VerifyCodeCheck, uow: IUnitOfWork) -> int:
+async def check_code(
+    code: VerifyCodeCheck, uow: IUnitOfWork, task_manager: ITaskManager
+) -> int:
     async with uow:
         code_dto: VerifyCodeDTO = await uow.verify_code.get_last_active_by_email(
             email_in=code.email
         )
 
         if code_dto and code_dto.is_active:
-            expire_date = datetime.now() - timedelta(
+            expire_date = datetime.now(UTC) - timedelta(
                 minutes=settings.auth_config.verification_code_expire
             )
-            if code_dto.created_at > expire_date and code.code == code_dto.code:
-                if settings.MODE != "TEST":
-                    tasks.deactivate_verify_code.delay(code_dto.email)
+            if (
+                code_dto.created_at.replace(tzinfo=UTC) > expire_date
+                and code.code == code_dto.code
+            ):
+                task_manager.deactivate_verify_code(email_in=code_dto.email)
                 return 200
 
         raise IncorrectVerificationCode

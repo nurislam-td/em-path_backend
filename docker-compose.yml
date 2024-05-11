@@ -50,3 +50,9 @@ services:
 networks:
   backend:
     driver: bridge
+
+
+# TODO make celery and redis and celery_beat and flower container
+# TODO celery tools running shell script and autoreload
+# TODO make diff running mode
+# TODO run test before running app container

@@ -8,9 +8,14 @@ from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send, user
-from app.tasks import tasks
 
-from .dependencies import get_uow, validate_auth_data, validate_refresh_token
+from ...interfaces.task_manager import ITaskManager
+from .dependencies import (
+    get_task_manager,
+    get_uow,
+    validate_auth_data,
+    validate_refresh_token,
+)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -28,17 +33,19 @@ async def login(
 
 @router.post("/email", status_code=status.HTTP_202_ACCEPTED)
 async def send_verify_message(
-    email_in: EmailStr,
+    email_in: EmailStr, task_manager: ITaskManager = Depends(get_task_manager)
 ) -> dict[str, str]:
-    tasks.send_verify_message.delay(email_in)
-    return {"status": "202", "message": "mail has been sended"}
+    task_manager.send_verify_message(email_in=email_in)
+    return {"status": "202", "message": "mail has been sent"}
 
 
 @router.post("/email/code", status_code=status.HTTP_200_OK)
 async def verify_code(
-    code: VerifyCodeCheck, uow: IUnitOfWork = Depends(get_uow)
+    code: VerifyCodeCheck,
+    uow: IUnitOfWork = Depends(get_uow),
+    task_manager: ITaskManager = Depends(get_task_manager),
 ) -> bool:
-    await mail_send.check_code(code, uow=uow)
+    await mail_send.check_code(code, uow=uow, task_manager=task_manager)
     return True
 
 
