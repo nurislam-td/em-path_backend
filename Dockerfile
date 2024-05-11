@@ -12,7 +12,7 @@ ENV POETRY_NO_INTERACTION=1 \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc
 
-WORKDIR /app
+WORKDIR /backend
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
@@ -23,8 +23,10 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --without dev --n
 # for runtime
 FROM python:3.12-slim as runtime
 
-ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"\
+WORKDIR /backend
+
+ENV VIRTUAL_ENV=/backend/.venv \
+    PATH="/backend/.venv/bin:$PATH"\
     PYTHONDONTWRITEBYTECODE=1\
     PYTHONUNBUFFERED=1
 
@@ -33,7 +35,8 @@ EXPOSE 8000
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY . .
-RUN chmod +x /docker/app.sh
+#COPY ./docker /docker
+RUN chmod +x ./docker/*
 
 
-ENTRYPOINT ["/docker/app.sh"]
+#ENTRYPOINT ["/docker/app.sh"]
