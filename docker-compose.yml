@@ -32,6 +32,7 @@ services:
       - backend
 
   redis:
+    container_name: redis
     image: redis:7-alpine
     networks:
       - backend
@@ -58,64 +59,64 @@ services:
     networks:
       - backend
 
-#  celery_worker:
-#    container_name: celery-worker
-#    env_file:
-#      - .env
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    image: empath-celery-worker
+  celery_worker:
+    container_name: celery-worker
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: empath-celery-worker
 #    volumes:
 #      - .:backend #in container folder
-#    depends_on:
-#      - postgres-db
-#      - redis
-#    environment:
-#      DB_HOST: postgres-db
-#    entrypoint: ["/backend/docker/celery_worker_start.sh"]
-#    networks:
-#      - backend
-#
-#  celery_beat:
-#    container_name: celery-beat
-#    env_file:
-#      - .env
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    image: empath-celery-beat
+    depends_on:
+      - postgres-db
+      - redis
+    environment:
+      DB_HOST: postgres-db
+    entrypoint: ["/backend/docker/celery_worker_start.sh"]
+    networks:
+      - backend
+
+  celery_beat:
+    container_name: celery-beat
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: empath-celery-beat
 #    volumes:
 #      - .:backend #in container folder
-#    depends_on:
-#      - postgres-db
-#      - redis
-#    environment:
-#      DB_HOST: postgres-db
-#    entrypoint: ["/backend/docker/celery_beat_start.sh" ]
-#    networks:
-#      - backend
-#
-#  celery_flower:
-#    container_name: celery-flower
-#    env_file:
-#      - .env
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    image: empath-celery-flower
+    depends_on:
+      - postgres-db
+      - redis
+    environment:
+      DB_HOST: postgres-db
+    entrypoint: ["/backend/docker/celery_beat_start.sh" ]
+    networks:
+      - backend
+
+  celery_flower:
+    container_name: celery-flower
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: empath-celery-flower
 #    volumes:
 #      - .:backend #in container folder
-#    ports:
-#      - "5555:5555"
-#    depends_on:
-#      - postgres-db
-#      - redis
-#    environment:
-#      DB_HOST: postgres-db
-#    entrypoint: ["/backend/docker/celery_flower_start.sh" ]
-#    networks:
-#      - backend
+    ports:
+      - "5555:5555"
+    depends_on:
+      - postgres-db
+      - redis
+    environment:
+      DB_HOST: postgres-db
+    entrypoint: ["/backend/docker/celery_flower_start.sh" ]
+    networks:
+      - backend
 
 
 networks:
@@ -125,7 +126,7 @@ networks:
 volumes:
   em_postgres_data:
 
-# TODO make celery and redis and celery_beat and flower container
+
 # TODO celery tools running shell script and autoreload
 # TODO make diff running mode
 # TODO run test before running app container
