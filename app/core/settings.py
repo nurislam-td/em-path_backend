@@ -68,7 +68,6 @@ class AuthJWT(CustomBaseSettings):
 
 
 class Settings(CustomBaseSettings):
-
     api_v1_prefix: str = "/api/v1"
 
     db: DbSettings = DbSettings()
@@ -76,6 +75,8 @@ class Settings(CustomBaseSettings):
     redis: RedisSettings = RedisSettings()
 
     auth_config: AuthJWT = AuthJWT()
+
+    template_path: Path = BASE_DIR / "app" / "templates"
 
     MODE: Literal["TEST", "DEV", "PROD"]
 

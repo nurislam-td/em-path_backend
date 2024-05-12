@@ -127,6 +127,6 @@ volumes:
   em_postgres_data:
 
 
-# TODO celery tools running shell script and autoreload
-# TODO make diff running mode
 # TODO run test before running app container
+# TODO make diff running mode
+# TODO celery tools autoreload

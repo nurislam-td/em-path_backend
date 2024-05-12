@@ -21,8 +21,11 @@ def deactivate_verify_code(email_in: str):
 @celery_app.task()
 def send_verify_message(email_in: str):
     email_code = secure.generate_random_num()
-    message = f"This your verification code {email_code}"
-    message = mail_send.send_email_message([email_in], message=message)
+    message = mail_send.send_email_template(
+        emails=[email_in],
+        template_name="mail_send/verify_code_send.html",
+        code=email_code,
+    )
     with engine.begin() as conn:
         table = cast(TableClause, VerifyCode.__table__)
         conn.execute(update(table).values(is_active=False).filter_by(email=email_in))
