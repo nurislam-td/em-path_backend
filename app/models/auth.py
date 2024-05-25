@@ -25,7 +25,7 @@ class User(Base):
     )
     password: Mapped[bytes]
     email: Mapped[str] = mapped_column(String(length=255), index=True, unique=True)
-    nickname: Mapped[str] = mapped_column(String(length=12))
+    nickname: Mapped[str] = mapped_column(String(length=20))
     sex: Mapped[Sex] = mapped_column(Enum(Sex), default=Sex.unknown)
     name: Mapped[str | None]
     lastname: Mapped[str | None]
