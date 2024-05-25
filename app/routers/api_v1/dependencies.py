@@ -9,10 +9,12 @@ from jwt.exceptions import (
     InvalidSignatureError,
     InvalidTokenError,
 )
+from pydantic import EmailStr
 
 from app.core.exceptions import (
     IncorrectCredentialsExceptions,
     InvalidToken,
+    UserAlreadyExistsException,
     UserNotExistsException,
 )
 from app.core.settings import settings
@@ -37,7 +39,8 @@ def get_task_manager() -> ITaskManager:
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api_v1/auth/login",
 )
-http_bearer = HTTPBearer()
+
+http_bearer = HTTPBearer(auto_error=False)
 
 
 async def validate_auth_data(
@@ -95,8 +98,20 @@ def validate_access_token(access_token: str) -> JWTPayload:
 def get_token_payload(
     http_auth: HTTPAuthorizationCredentials = Depends(http_bearer),
 ) -> JWTPayload:
+    if not http_auth:
+        raise HTTPException(status_code=401, detail="Not authenticated")
     token = http_auth.credentials
     return validate_access_token(access_token=token)
+
+
+async def check_email_exists(
+    email_in: EmailStr, uow: IUnitOfWork = Depends(get_uow)
+) -> EmailStr:
+    async with uow:
+        user_dto: UserDTO = await uow.user.get_by_email(email_in)
+        if user_dto:
+            raise UserAlreadyExistsException
+    return email_in
 
 
 async def get_current_user(
