@@ -11,6 +11,7 @@ from app.service import mail_send, user
 
 from ...interfaces.task_manager import ITaskManager
 from .dependencies import (
+    check_email_exists,
     get_task_manager,
     get_uow,
     validate_auth_data,
@@ -33,7 +34,8 @@ async def login(
 
 @router.post("/email", status_code=status.HTTP_202_ACCEPTED)
 async def send_verify_message(
-    email_in: EmailStr, task_manager: ITaskManager = Depends(get_task_manager)
+    email_in: EmailStr = Depends(check_email_exists),
+    task_manager: ITaskManager = Depends(get_task_manager),
 ) -> dict[str, str]:
     task_manager.send_verify_message(email_in=email_in)
     return {"status": "202", "message": "mail has been sent"}
