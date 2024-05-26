@@ -9,10 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 
-class Sex(str, enum.Enum):
+class Gender(str, enum.Enum):
     male = "male"
     female = "female"
-    unknown = "unknown"
+    other = "other"
 
 
 class User(Base):
@@ -26,7 +26,7 @@ class User(Base):
     password: Mapped[bytes]
     email: Mapped[str] = mapped_column(String(length=255), index=True, unique=True)
     nickname: Mapped[str] = mapped_column(String(length=20))
-    sex: Mapped[Sex] = mapped_column(Enum(Sex), default=Sex.unknown)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), default=Gender.other)
     name: Mapped[str | None]
     lastname: Mapped[str | None]
     patronymic: Mapped[str | None]

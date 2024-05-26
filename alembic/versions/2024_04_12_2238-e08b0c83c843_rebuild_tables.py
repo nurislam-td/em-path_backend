@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column("email", sa.String(length=255), nullable=False),
         sa.Column("nickname", sa.String(length=12), nullable=False),
         sa.Column(
-            "sex", sa.Enum("male", "female", "unknown", name="sex"), nullable=False
+            "gender", sa.Enum("male", "female", "other", name="gender"), nullable=False
         ),
         sa.Column("name", sa.String(), nullable=True),
         sa.Column("lastname", sa.String(), nullable=True),

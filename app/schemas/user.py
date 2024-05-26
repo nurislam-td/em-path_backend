@@ -19,10 +19,10 @@ STRONG_PASSWORD_PATTERN = re.compile(
 )
 
 
-class Sex(str, Enum):
+class Gender(str, Enum):
     male = "male"
     female = "female"
-    unknown = "unknown"
+    other = "other"
 
 
 class UserLogin(BaseModel):
@@ -56,7 +56,7 @@ class UserResetPassword(UserLogin):
 class UserUpdate(BaseModel):
     email: EmailStr | None = None
     nickname: str | None = None
-    sex: Sex | None = None
+    gender: Gender | None = None
     name: str | None = None
     lastname: str | None = None
     patronymic: str | None = None
@@ -81,7 +81,7 @@ class UserDTO(BaseModel):
     email: EmailStr
     password: bytes
     nickname: str
-    sex: Sex | None = Sex.unknown
+    gender: Gender | None = Gender.other
     name: str | None = None
     lastname: str | None = None
     patronymic: str | None = None
