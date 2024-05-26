@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.interfaces.repo import DBModel, DTOSchema, ISQLRepo
+from app.service.interfaces.repo import DBModel, DTOSchema, ISQLRepo
 
 
 class SQLAlchemyRepo(ISQLRepo[DTOSchema, DBModel]):

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Type
 
-from app.interfaces.repo import ISQLTokenRepo, ISQLUserRepo, ISQLVerifyCodeRepo
+from app.service.interfaces.repo import ISQLTokenRepo, ISQLUserRepo, ISQLVerifyCodeRepo
 
 
 class IUnitOfWork(ABC):

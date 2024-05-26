@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from app.core.exceptions import UserAlreadyExistsException, UserNotExistsException
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
 from app.service import token
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 async def create_user(user_data: UserCreate, uow: IUnitOfWork) -> UserDTO:

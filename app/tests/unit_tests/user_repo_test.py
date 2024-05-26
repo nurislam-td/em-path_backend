@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 async def test_add_and_get_user_with_pydantic_model(uow: IUnitOfWork):

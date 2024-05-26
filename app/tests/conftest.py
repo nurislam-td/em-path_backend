@@ -7,7 +7,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
-from app.interfaces.task_manager import ITaskManager
+from app.service.interfaces.task_manager import ITaskManager
 
 # TODO refactor this import
 os.environ["MODE"] = "TEST"

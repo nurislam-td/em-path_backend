@@ -3,9 +3,9 @@ from uuid import UUID
 import pytest
 
 from app.core.settings import settings
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.service import token
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 @pytest.fixture(scope="function")

@@ -18,12 +18,12 @@ from app.core.exceptions import (
     UserNotExistsException,
 )
 from app.core.settings import settings
-from app.interfaces.task_manager import ITaskManager
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.repo.unit_of_work import UnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserDTO, UserLogin
 from app.service import secure
+from app.service.interfaces.task_manager import ITaskManager
+from app.service.interfaces.unit_of_work import IUnitOfWork
 from app.service.token import decode_jwt
 from app.tasks.tasks import CeleryTaskManager
 

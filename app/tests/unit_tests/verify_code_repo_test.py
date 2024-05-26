@@ -1,4 +1,4 @@
-from app.interfaces.unit_of_work import IUnitOfWork
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 async def test_get_last_active_by_email(uow: IUnitOfWork):

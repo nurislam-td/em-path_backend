@@ -1,10 +1,10 @@
 import pytest
 
 from app.core.exceptions import IncorrectVerificationCode
-from app.interfaces.task_manager import ITaskManager
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send
+from app.service.interfaces.task_manager import ITaskManager
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 async def test_check_code(uow: IUnitOfWork, task_manager: ITaskManager):

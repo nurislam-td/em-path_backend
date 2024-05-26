@@ -3,13 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import EmailStr
 
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send, user
+from app.service.interfaces.task_manager import ITaskManager
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
-from ...interfaces.task_manager import ITaskManager
 from .dependencies import (
     check_email_exists,
     get_task_manager,

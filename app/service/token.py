@@ -5,8 +5,8 @@ import jwt
 from fastapi.encoders import jsonable_encoder
 
 from app.core.settings import settings
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import JWTPayload, TokenOut
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 def encode_jwt(

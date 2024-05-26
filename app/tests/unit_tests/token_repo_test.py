@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.schemas.token import TokenDTO
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 async def test_get_by_user_id(uow: IUnitOfWork):

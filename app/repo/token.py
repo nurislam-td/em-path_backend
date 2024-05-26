@@ -2,14 +2,13 @@ from typing import override
 
 from sqlalchemy import select
 
-from app.interfaces.repo import ISQLTokenRepo
 from app.models.auth import RefreshToken
 from app.repo.base import SQLAlchemyRepo
 from app.schemas.token import TokenDTO
+from app.service.interfaces.repo import ISQLTokenRepo
 
 
 class TokenRepo(SQLAlchemyRepo[TokenDTO, RefreshToken], ISQLTokenRepo):
-
     @override
     async def get_by_user_id(self, user_id) -> TokenDTO:
         query = select(self._table).filter_by(user_id=user_id)

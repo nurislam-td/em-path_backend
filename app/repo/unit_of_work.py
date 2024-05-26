@@ -1,5 +1,4 @@
 from app.core.database import async_session_maker
-from app.interfaces.unit_of_work import IUnitOfWork
 from app.models.auth import RefreshToken, User, VerifyCode
 from app.repo.token import TokenRepo
 from app.repo.user import UserRepo
@@ -7,6 +6,7 @@ from app.repo.verify_code import VerifyCodeRepo
 from app.schemas.token import TokenDTO
 from app.schemas.user import UserDTO
 from app.schemas.verify_code import VerifyCodeDTO
+from app.service.interfaces.unit_of_work import IUnitOfWork
 
 
 class UnitOfWork(IUnitOfWork):
