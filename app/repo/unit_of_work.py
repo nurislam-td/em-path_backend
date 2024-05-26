@@ -1,4 +1,4 @@
-from app.core.database import async_session_maker
+from app.common.database import async_session_maker
 from app.models.auth import RefreshToken, User, VerifyCode
 from app.repo.token import AlchemyTokenSQLRepo
 from app.repo.user import AlchemyUserSQLRepo

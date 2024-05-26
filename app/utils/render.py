@@ -1,6 +1,6 @@
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from app.core.settings import settings
+from app.common.settings import settings
 
 template_loader = FileSystemLoader(searchpath=settings.template_path)
 template_env = Environment(

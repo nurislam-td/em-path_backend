@@ -8,8 +8,8 @@ from ssl import create_default_context
 from dotenv import load_dotenv
 from pydantic import EmailStr
 
-from app.core.exceptions import IncorrectVerificationCode
-from app.core.settings import settings
+from app.common.exceptions import IncorrectVerificationCode
+from app.common.settings import settings
 from app.schemas.verify_code import VerifyCodeCheck, VerifyCodeDTO
 from app.service.abstract.task_manager import ITaskManager
 from app.service.abstract.unit_of_work import UnitOfWork

@@ -1,6 +1,6 @@
 import pytest
 
-from app.core.exceptions import IncorrectVerificationCode
+from app.common.exceptions import IncorrectVerificationCode
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send
 from app.service.abstract.task_manager import ITaskManager

@@ -1,7 +1,7 @@
 from sqlalchemy import NullPool, create_engine
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.core.settings import settings
+from app.common.settings import settings
 
 if settings.MODE == "DEV":
     DATABASE_URL = settings.db.url

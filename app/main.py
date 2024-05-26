@@ -8,12 +8,12 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 
-from app.core.exception_handler import (
+from app.common.exception_handler import (
     app_exception_handler,
     request_validation_exception_handler,
 )
-from app.core.exceptions import AppException
-from app.core.settings import settings
+from app.common.exceptions import AppException
+from app.common.settings import settings
 from app.routers.api_v1.api import api_router
 
 

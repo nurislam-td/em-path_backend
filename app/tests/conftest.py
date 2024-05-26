@@ -11,8 +11,8 @@ from app.service.abstract.task_manager import ITaskManager
 
 # TODO refactor this import
 os.environ["MODE"] = "TEST"
-from app.core.database import async_engine, async_session_maker
-from app.core.settings import settings
+from app.common.database import async_engine, async_session_maker
+from app.common.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import RefreshToken, User, VerifyCode
 from app.models.base import Base

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.core.exceptions import UserAlreadyExistsException, UserNotExistsException
+from app.common.exceptions import UserAlreadyExistsException, UserNotExistsException
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
 from app.service import token

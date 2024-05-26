@@ -2,7 +2,7 @@ from uuid import UUID
 
 import pytest
 
-from app.core.settings import settings
+from app.common.settings import settings
 from app.schemas.token import JWTPayload, TokenOut
 from app.service import token
 from app.service.abstract.unit_of_work import UnitOfWork

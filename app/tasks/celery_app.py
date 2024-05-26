@@ -1,7 +1,7 @@
 from celery import Celery
 from celery.schedules import crontab
 
-from app.core.settings import settings
+from app.common.settings import settings
 
 celery_app = Celery("tasks", broker=settings.redis.url, include=["app.tasks.tasks"])
 

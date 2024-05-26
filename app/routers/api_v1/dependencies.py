@@ -11,13 +11,13 @@ from jwt.exceptions import (
 )
 from pydantic import EmailStr
 
-from app.core.exceptions import (
+from app.common.exceptions import (
     IncorrectCredentialsExceptions,
     InvalidToken,
     UserAlreadyExistsException,
     UserNotExistsException,
 )
-from app.core.settings import settings
+from app.common.settings import settings
 from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserDTO, UserLogin

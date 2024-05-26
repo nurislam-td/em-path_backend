@@ -3,8 +3,8 @@ from typing import cast
 
 from sqlalchemy import TableClause, delete, insert, update
 
-from app.core.database import engine
-from app.core.settings import settings
+from app.common.database import engine
+from app.common.settings import settings
 from app.models.auth import VerifyCode
 from app.service import mail_send, secure
 from app.service.abstract.task_manager import ITaskManager

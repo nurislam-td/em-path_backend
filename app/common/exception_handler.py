@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 
-from app.core.exceptions import AppException
+from app.common.exceptions import AppException
 
 # Exception template
 # {
