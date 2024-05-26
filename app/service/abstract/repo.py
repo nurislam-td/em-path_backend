@@ -1,25 +1,17 @@
 from abc import abstractmethod
-from typing import Generic, Type, TypeVar
+from typing import Generic, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
-from sqlalchemy.orm import DeclarativeBase
 
-from app.models.auth import RefreshToken, User, VerifyCode
 from app.schemas.token import TokenDTO
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeDTO
 
 DTOSchema = TypeVar("DTOSchema", bound=BaseModel)
-DBModel = TypeVar("DBModel", bound=DeclarativeBase)
 
 
-class ISQLRepo(Generic[DTOSchema, DBModel]):
-    @abstractmethod
-    def __init__(
-        self, session, schema: Type[DTOSchema], model: Type[DBModel]
-    ) -> None: ...
-
+class Repo(Generic[DTOSchema]):
     @abstractmethod
     async def create(self, values: dict) -> DTOSchema | None: ...
 
@@ -39,7 +31,7 @@ class ISQLRepo(Generic[DTOSchema, DBModel]):
     async def delete(self, filters: dict) -> None: ...
 
 
-class ISQLTokenRepo(ISQLRepo[TokenDTO, RefreshToken]):
+class TokenRepo(Repo[TokenDTO]):
     @abstractmethod
     async def get_by_user_id(self, user_id: UUID) -> TokenDTO | None: ...
 
@@ -49,7 +41,7 @@ class ISQLTokenRepo(ISQLRepo[TokenDTO, RefreshToken]):
     ) -> TokenDTO | None: ...
 
 
-class ISQLUserRepo(ISQLRepo[UserDTO, User]):
+class UserRepo(Repo[UserDTO]):
     @abstractmethod
     async def get_by_email(self, email: EmailStr) -> UserDTO | None: ...
 
@@ -62,7 +54,7 @@ class ISQLUserRepo(ISQLRepo[UserDTO, User]):
     ) -> UserDTO | None: ...
 
 
-class ISQLVerifyCodeRepo(ISQLRepo[VerifyCodeDTO, VerifyCode]):
+class VerifyCodeRepo(Repo[VerifyCodeDTO]):
     @abstractmethod
     async def get_last_active_by_email(
         self, email_in: EmailStr

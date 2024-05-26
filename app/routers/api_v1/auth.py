@@ -7,8 +7,8 @@ from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send, user
-from app.service.interfaces.task_manager import ITaskManager
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.task_manager import ITaskManager
+from app.service.abstract.unit_of_work import UnitOfWork
 
 from .dependencies import (
     check_email_exists,
@@ -25,7 +25,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 async def login(
     response: Response,
     user_data: Annotated[UserDTO, Depends(validate_auth_data)],
-    uow: IUnitOfWork = Depends(get_uow),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> TokenOut:
     tokens = await user.login(user_data=user_data, uow=uow)
     response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
@@ -44,7 +44,7 @@ async def send_verify_message(
 @router.post("/email/code", status_code=status.HTTP_200_OK)
 async def verify_code(
     code: VerifyCodeCheck,
-    uow: IUnitOfWork = Depends(get_uow),
+    uow: UnitOfWork = Depends(get_uow),
     task_manager: ITaskManager = Depends(get_task_manager),
 ) -> bool:
     await mail_send.check_code(code, uow=uow, task_manager=task_manager)
@@ -55,7 +55,7 @@ async def verify_code(
 async def refresh_token(
     response: Response,
     jwt_payload: JWTPayload = Depends(validate_refresh_token),
-    uow: IUnitOfWork = Depends(get_uow),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> TokenOut:
     tokens = await user.refresh_tokens(jwt_payload=jwt_payload, uow=uow)
     response.set_cookie(key="refresh_token", value=tokens.refresh_token, httponly=True)
@@ -64,6 +64,6 @@ async def refresh_token(
 
 @router.patch("/password", status_code=status.HTTP_200_OK)
 async def reset_password(
-    update_data: UserResetPassword, uow: IUnitOfWork = Depends(get_uow)
+    update_data: UserResetPassword, uow: UnitOfWork = Depends(get_uow)
 ) -> UserDTO:
     return await user.reset_password(update_data=update_data, uow=uow)

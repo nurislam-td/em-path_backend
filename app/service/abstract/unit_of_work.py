@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
-from app.service.interfaces.repo import ISQLTokenRepo, ISQLUserRepo, ISQLVerifyCodeRepo
+from app.service.abstract.repo import TokenRepo, UserRepo, VerifyCodeRepo
 
 
-class IUnitOfWork(ABC):
-    user: ISQLUserRepo
-    token: ISQLTokenRepo
-    verify_code: ISQLVerifyCodeRepo
+class UnitOfWork(ABC):
+    user: UserRepo
+    token: TokenRepo
+    verify_code: VerifyCodeRepo
 
     @abstractmethod
     def __init__(self): ...

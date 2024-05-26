@@ -1,4 +1,4 @@
-from app.service.interfaces.task_manager import ITaskManager
+from app.service.abstract.task_manager import ITaskManager
 
 
 def test_task_run(task_manager: ITaskManager):

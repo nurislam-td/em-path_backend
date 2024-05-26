@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.core.settings import settings
 from app.schemas.token import JWTPayload, TokenOut
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.unit_of_work import UnitOfWork
 
 
 def encode_jwt(
@@ -56,7 +56,7 @@ def generate_tokens(
     return access_token, refresh_token
 
 
-async def get_tokens(payload: dict[str, Any], uow: IUnitOfWork):
+async def get_tokens(payload: dict[str, Any], uow: UnitOfWork):
     jwt_data = JWTPayload(sub=payload["sub"], email=payload["email"])
     access_token, refresh_token = generate_tokens(jwt_payload=jwt_data)
     async with uow:

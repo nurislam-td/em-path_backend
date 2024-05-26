@@ -1,10 +1,10 @@
 from uuid import UUID
 
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.unit_of_work import UnitOfWork
 
 
-async def test_add_and_get_user_with_pydantic_model(uow: IUnitOfWork):
+async def test_add_and_get_user_with_pydantic_model(uow: UnitOfWork):
     user_in = UserCreate(
         nickname="melaton", email="coolest2@example.com", password="String03@"
     )
@@ -19,7 +19,7 @@ async def test_add_and_get_user_with_pydantic_model(uow: IUnitOfWork):
     assert user_get.email == user_created.email
 
 
-async def test_get_user_by_email(uow: IUnitOfWork):
+async def test_get_user_by_email(uow: UnitOfWork):
     email = "user@example.com"
     async with uow:
         user_dto: UserDTO = await uow.user.get_by_email(email=email)
@@ -28,14 +28,14 @@ async def test_get_user_by_email(uow: IUnitOfWork):
         assert user_dto.email == email
 
 
-async def test_user_not_exists(uow: IUnitOfWork):
+async def test_user_not_exists(uow: UnitOfWork):
     email = "some_random_fake@mail.com"
     async with uow:
         user_dto: None = await uow.user.get_by_email(email=email)
     assert user_dto is None
 
 
-async def test_user_update(uow: IUnitOfWork):
+async def test_user_update(uow: UnitOfWork):
     user_before = dict(
         nickname="string",
         email="userus@example.com",
@@ -65,7 +65,7 @@ async def test_user_update(uow: IUnitOfWork):
         assert user_before != updated_user.model_dump()
 
 
-async def test_reset_password(uow: IUnitOfWork):
+async def test_reset_password(uow: UnitOfWork):
     user_in = UserResetPassword(email="userus@example.com", password="SomePassHard98$")
     user_id = UUID("32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7")
     password_before = "$2b$12$pBXO3Qb8Q708eGJV3qyDCOMTwtK8I/2AI4xHzg7SsB8KEnPooWAly"
@@ -77,7 +77,7 @@ async def test_reset_password(uow: IUnitOfWork):
         assert user_dto.password != password_before
 
 
-async def test_user_delete(uow: IUnitOfWork):
+async def test_user_delete(uow: UnitOfWork):
     async with uow:
         user_id = UUID("ecc14949-46c2-4f18-b71f-31f27c21797e")
         assert not (await uow.user.delete(dict(id=user_id)))

@@ -18,18 +18,18 @@ from app.core.exceptions import (
     UserNotExistsException,
 )
 from app.core.settings import settings
-from app.repo.unit_of_work import UnitOfWork
+from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserDTO, UserLogin
 from app.service import secure
-from app.service.interfaces.task_manager import ITaskManager
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.task_manager import ITaskManager
+from app.service.abstract.unit_of_work import UnitOfWork
 from app.service.token import decode_jwt
 from app.tasks.tasks import CeleryTaskManager
 
 
-def get_uow() -> IUnitOfWork:
-    return UnitOfWork()
+def get_uow() -> UnitOfWork:
+    return SQLAlchemyUnitOfWork()
 
 
 def get_task_manager() -> ITaskManager:
@@ -45,7 +45,7 @@ http_bearer = HTTPBearer(auto_error=False)
 
 async def validate_auth_data(
     user_credentials: UserLogin,
-    uow: IUnitOfWork = Depends(get_uow),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     async with uow:
         user_dto: UserDTO = await uow.user.get_by_email(user_credentials.email)
@@ -105,7 +105,7 @@ def get_token_payload(
 
 
 async def check_email_exists(
-    email_in: EmailStr, uow: IUnitOfWork = Depends(get_uow)
+    email_in: EmailStr, uow: UnitOfWork = Depends(get_uow)
 ) -> EmailStr:
     async with uow:
         user_dto: UserDTO = await uow.user.get_by_email(email_in)
@@ -116,7 +116,7 @@ async def check_email_exists(
 
 async def get_current_user(
     payload: JWTPayload = Depends(get_token_payload),
-    uow: IUnitOfWork = Depends(get_uow),
+    uow: UnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     async with uow:
         user_dto: UserDTO = await uow.user.get(pk=payload.sub)

@@ -7,7 +7,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
 
-from app.service.interfaces.task_manager import ITaskManager
+from app.service.abstract.task_manager import ITaskManager
 
 # TODO refactor this import
 os.environ["MODE"] = "TEST"
@@ -16,7 +16,7 @@ from app.core.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import RefreshToken, User, VerifyCode
 from app.models.base import Base
-from app.repo.unit_of_work import UnitOfWork
+from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -92,8 +92,8 @@ async def auth_ac() -> AsyncGenerator[AsyncClient, Any]:
 
 
 @pytest.fixture(scope="function")
-async def uow() -> AsyncGenerator[UnitOfWork, Any]:
-    yield UnitOfWork(async_session_maker)
+async def uow() -> AsyncGenerator[SQLAlchemyUnitOfWork, Any]:
+    yield SQLAlchemyUnitOfWork(async_session_maker)
 
 
 # TODO add "celery" task test

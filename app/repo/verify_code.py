@@ -2,13 +2,12 @@ from typing import override
 
 from sqlalchemy import select
 
-from app.models.auth import VerifyCode
-from app.repo.base import SQLAlchemyRepo
+from app.repo.base import AlchemyRepo
 from app.schemas.verify_code import VerifyCodeDTO
-from app.service.interfaces.repo import ISQLVerifyCodeRepo
+from app.service.abstract.repo import VerifyCodeRepo
 
 
-class VerifyCodeRepo(SQLAlchemyRepo[VerifyCodeDTO, VerifyCode], ISQLVerifyCodeRepo):
+class AlchemyVerifyCodeSQLRepo(AlchemyRepo[VerifyCodeDTO], VerifyCodeRepo):
     @override
     async def get_last_active_by_email(self, email_in) -> VerifyCodeDTO | None:
         query = (

@@ -1,17 +1,17 @@
 from uuid import UUID
 
 from app.schemas.token import TokenDTO
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.unit_of_work import UnitOfWork
 
 
-async def test_get_by_user_id(uow: IUnitOfWork):
+async def test_get_by_user_id(uow: UnitOfWork):
     user_id = UUID("32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7")
     async with uow:
         token = await uow.token.get_by_user_id(user_id=user_id)
         assert token
 
 
-async def test_save_token(uow: IUnitOfWork):
+async def test_save_token(uow: UnitOfWork):
     user_id = UUID("7f458c5b-ed99-41f4-b451-a5b220a60a1c")
     async with uow:
         assert await uow.token.get_by_user_id(user_id=user_id) is None

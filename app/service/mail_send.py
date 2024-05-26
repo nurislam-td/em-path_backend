@@ -11,8 +11,8 @@ from pydantic import EmailStr
 from app.core.exceptions import IncorrectVerificationCode
 from app.core.settings import settings
 from app.schemas.verify_code import VerifyCodeCheck, VerifyCodeDTO
-from app.service.interfaces.task_manager import ITaskManager
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.task_manager import ITaskManager
+from app.service.abstract.unit_of_work import UnitOfWork
 from app.utils import render
 
 load_dotenv()
@@ -73,7 +73,7 @@ def send_email_template(
 
 
 async def check_code(
-    code: VerifyCodeCheck, uow: IUnitOfWork, task_manager: ITaskManager
+    code: VerifyCodeCheck, uow: UnitOfWork, task_manager: ITaskManager
 ) -> int:
     async with uow:
         code_dto: VerifyCodeDTO = await uow.verify_code.get_last_active_by_email(

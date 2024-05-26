@@ -5,7 +5,7 @@ import pytest
 from app.core.settings import settings
 from app.schemas.token import JWTPayload, TokenOut
 from app.service import token
-from app.service.interfaces.unit_of_work import IUnitOfWork
+from app.service.abstract.unit_of_work import UnitOfWork
 
 
 @pytest.fixture(scope="function")
@@ -39,7 +39,7 @@ async def test_generate_tokens(payload: dict):
     assert len(tokens) == 2
 
 
-async def test_decode_token(uow: IUnitOfWork):
+async def test_decode_token(uow: UnitOfWork):
     async with uow:
         token_dto = await uow.token.get(pk=UUID("4ee181fc-d996-453a-acee-307904b13771"))
         assert token_dto is not None, "TOKEN NOT EXISTS"
@@ -51,7 +51,7 @@ async def test_decode_token(uow: IUnitOfWork):
     assert UUID(payload["sub"]) == token_dto.user_id
 
 
-async def test_get_tokens(uow: IUnitOfWork, payload: dict):
+async def test_get_tokens(uow: UnitOfWork, payload: dict):
     tokens = await token.get_tokens(payload=payload, uow=uow)
     assert isinstance(tokens, TokenOut)
     assert len(tokens.model_dump()) == 2

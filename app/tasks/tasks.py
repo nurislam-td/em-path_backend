@@ -7,7 +7,7 @@ from app.core.database import engine
 from app.core.settings import settings
 from app.models.auth import VerifyCode
 from app.service import mail_send, secure
-from app.service.interfaces.task_manager import ITaskManager
+from app.service.abstract.task_manager import ITaskManager
 from app.tasks.celery_app import celery_app
 
 

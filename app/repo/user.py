@@ -3,14 +3,13 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from app.models.auth import User
-from app.repo.base import SQLAlchemyRepo
+from app.repo.base import AlchemyRepo
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword
-from app.service.interfaces.repo import ISQLUserRepo
+from app.service.abstract.repo import UserRepo
 from app.service.secure import get_password_hash
 
 
-class UserRepo(SQLAlchemyRepo[UserDTO, User], ISQLUserRepo):
+class AlchemyUserSQLRepo(AlchemyRepo[UserDTO], UserRepo):
     @override
     async def get_by_email(self, email) -> UserDTO | None:
         query = select(self._table).filter_by(email=email)

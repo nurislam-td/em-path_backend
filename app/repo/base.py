@@ -1,4 +1,4 @@
-from typing import Type, cast, override
+from typing import Type, TypeVar, cast, override
 from uuid import UUID
 
 from sqlalchemy import (
@@ -14,11 +14,14 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 
-from app.service.interfaces.repo import DBModel, DTOSchema, ISQLRepo
+from app.service.abstract.repo import DTOSchema, Repo
+
+DBModel = TypeVar("DBModel", bound=DeclarativeBase)
 
 
-class SQLAlchemyRepo(ISQLRepo[DTOSchema, DBModel]):
+class AlchemyRepo(Repo[DTOSchema]):
     _model: DBModel
     _schema: DTOSchema
 
