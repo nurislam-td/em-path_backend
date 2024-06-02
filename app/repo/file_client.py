@@ -7,13 +7,13 @@ from app.service.abstract.file_client import FileClient
 
 
 class S3FileClient(FileClient):
-    def __init__(self):
+    def __init__(self, access_key, secret_key, bucket_name, endpoint_url):
         self.config = {
-            "access_key": None,
-            "secret_key": None,
-            "endpoint": None,
+            "aws_access_key": access_key,
+            "aws_secret_key": secret_key,
+            "endpoint_url": endpoint_url,
         }
-        self.bucket_name = ...
+        self.bucket_name = bucket_name
         self.session = get_session()
 
     @asynccontextmanager

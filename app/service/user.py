@@ -4,6 +4,7 @@ from app.common.exceptions import UserAlreadyExistsException, UserNotExistsExcep
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
 from app.service import token
+from app.service.abstract.file_client import FileClient
 from app.service.abstract.unit_of_work import UnitOfWork
 
 
@@ -46,8 +47,15 @@ async def reset_password(update_data: UserResetPassword, uow: UnitOfWork) -> Use
 
 
 async def update_user(
-    user_id: UUID, update_data: UserUpdate, uow: UnitOfWork
+    user_id: UUID,
+    update_data: UserUpdate,
+    uow: UnitOfWork,
+    file_client: FileClient,
 ) -> UserDTO:
+    if update_data.image:
+        await file_client.upload_file(update_data.image)
+        image_url = "avatar/user_id/update_data.image.name"
+        update_data.image = image_url
     async with uow:
         updated_user: UserDTO = await uow.user.update_one(
             update_data.model_dump(exclude_unset=True), pk=user_id

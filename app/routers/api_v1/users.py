@@ -7,7 +7,8 @@ from app.schemas.user import UserCreate, UserDTO, UserUpdate
 from app.service import user
 from app.service.abstract.unit_of_work import UnitOfWork
 
-from .dependencies import get_current_user, get_uow
+from ...service.abstract.file_client import FileClient
+from .dependencies import get_current_user, get_file_client, get_uow
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -25,10 +26,14 @@ async def register_user(
 async def update_user(
     update_data: UserUpdate,
     uow: UnitOfWork = Depends(get_uow),
+    file_client: FileClient = Depends(get_file_client),
     user_data: UserDTO = Depends(get_current_user),
 ) -> UserDTO:
     return await user.update_user(
-        user_id=user_data.id, update_data=update_data, uow=uow
+        user_id=user_data.id,
+        update_data=update_data,
+        uow=uow,
+        file_client=file_client,
     )
 
 

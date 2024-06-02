@@ -8,7 +8,17 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class CustomBaseSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", extra="ignore", case_sensitive=False
+    )
+
+
+class S3Settings(CustomBaseSettings):
+    access_key: str
+    secret_key: str
+    private_bucket_name: str
+    public_bucket_name: str
+    endpoint_url: str
 
 
 class DbSettings(CustomBaseSettings):
@@ -71,6 +81,8 @@ class Settings(CustomBaseSettings):
     api_v1_prefix: str = "/api/v1"
 
     db: DbSettings = DbSettings()
+
+    s3: S3Settings = S3Settings()
 
     redis: RedisSettings = RedisSettings()
 

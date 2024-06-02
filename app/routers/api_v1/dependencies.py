@@ -18,10 +18,12 @@ from app.common.exceptions import (
     UserNotExistsException,
 )
 from app.common.settings import settings
+from app.repo.file_client import S3FileClient
 from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserDTO, UserLogin
 from app.service import secure
+from app.service.abstract.file_client import FileClient
 from app.service.abstract.task_manager import ITaskManager
 from app.service.abstract.unit_of_work import UnitOfWork
 from app.service.token import decode_jwt
@@ -34,6 +36,15 @@ def get_uow() -> UnitOfWork:
 
 def get_task_manager() -> ITaskManager:
     return CeleryTaskManager()
+
+
+def get_file_client() -> FileClient:
+    return S3FileClient(
+        access_key=settings.s3.access_key,
+        secret_key=settings.s3.secret_key,
+        bucket_name=settings.s3.private_bucket_name,
+        endpoint_url=settings.s3.endpoint_url,
+    )
 
 
 oauth2_scheme = OAuth2PasswordBearer(
