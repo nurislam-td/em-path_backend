@@ -53,8 +53,8 @@ async def update_user(
     file_client: FileClient,
 ) -> UserDTO:
     if update_data.image:
-        await file_client.upload_file(update_data.image)
         image_url = "avatar/user_id/update_data.image.name"
+        await file_client.upload_file(file=update_data.image, file_path=image_url)
         update_data.image = image_url
     async with uow:
         updated_user: UserDTO = await uow.user.update_one(

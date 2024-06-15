@@ -9,8 +9,8 @@ from app.service.abstract.file_client import FileClient
 class S3FileClient(FileClient):
     def __init__(self, access_key, secret_key, bucket_name, endpoint_url):
         self.config = {
-            "aws_access_key": access_key,
-            "aws_secret_key": secret_key,
+            "aws_access_key_id": access_key,
+            "aws_secret_access_key": secret_key,
             "endpoint_url": endpoint_url,
         }
         self.bucket_name = bucket_name
@@ -24,7 +24,7 @@ class S3FileClient(FileClient):
     async def upload_file(self, file_path, file):
         try:
             async with self.get_client() as s3_client:
-                await s3_client.upload_file(
+                await s3_client.put_object(
                     Key=file_path,
                     Bucket=self.bucket_name,
                     Body=file,

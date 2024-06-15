@@ -24,7 +24,7 @@ async def register_user(
 
 @router.patch("", status_code=status.HTTP_200_OK)
 async def update_user(
-    update_data: UserUpdate,
+    update_data: UserUpdate = Depends(),
     uow: UnitOfWork = Depends(get_uow),
     file_client: FileClient = Depends(get_file_client),
     user_data: UserDTO = Depends(get_current_user),

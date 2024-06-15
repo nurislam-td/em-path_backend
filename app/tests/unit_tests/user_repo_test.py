@@ -41,7 +41,7 @@ async def test_user_update(uow: UnitOfWork):
         email="userus@example.com",
         id=UUID("32ffa9be-e75e-4ebe-83d7-8d400c6c3bc7"),
         password="$2b$12$pBXO3Qb8Q708eGJV3qyDCOMTwtK8I/2AI4xHzg7SsB8KEnPooWAly",
-        sex="unknown",
+        gender="other",
         name=None,
         lastname=None,
         patronymic=None,

@@ -32,13 +32,18 @@ async def login(
     return tokens
 
 
-@router.post("/email", status_code=status.HTTP_202_ACCEPTED)
-async def send_verify_message(
+@router.post("/registration/email", status_code=status.HTTP_202_ACCEPTED)
+async def send_verify_message_for_registration(
     email_in: EmailStr = Depends(check_email_exists),
     task_manager: ITaskManager = Depends(get_task_manager),
 ) -> dict[str, str]:
     task_manager.send_verify_message(email_in=email_in)
     return {"status": "202", "message": "mail has been sent"}
+
+
+@router.post("/restoration/email", status_code=status.HTTP_202_ACCEPTED)
+async def send_verify_message_for_reset_pass():
+    pass  # TODO
 
 
 @router.post("/email/code", status_code=status.HTTP_200_OK)

@@ -3,6 +3,7 @@ from datetime import date
 from enum import Enum
 from uuid import UUID
 
+from fastapi import Form, UploadFile
 from pydantic import (
     AliasChoices,
     BaseModel,
@@ -54,14 +55,14 @@ class UserResetPassword(UserLogin):
 
 
 class UserUpdate(BaseModel):
-    email: EmailStr | None = None
-    nickname: str | None = None
-    gender: Gender | None = None
-    name: str | None = None
-    lastname: str | None = None
-    patronymic: str | None = None
-    date_birth: date | None = None
-    image: str | None = None
+    email: EmailStr | None = Form(None)  # TODO new verify email
+    nickname: str | None = Form(None)
+    gender: Gender | None = Form(None)
+    name: str | None = Form(None)
+    lastname: str | None = Form(None)
+    patronymic: str | None = Form(None)
+    date_birth: date | None = Form(None)
+    image: UploadFile | None = None
 
     @model_validator(mode="after")
     def validate_model(self):
