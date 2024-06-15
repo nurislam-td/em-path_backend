@@ -14,7 +14,7 @@ name = "em-path-backend"
 version = "0.1.0"
 description = ""
 authors = ["nuris <tasbolatov.nd03@gmail.com>"]
-readme = "README.md"
+readme = "Readme.md"
 package-mode = false
 
 [tool.poetry.dependencies]
