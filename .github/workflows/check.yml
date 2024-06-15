@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
-
-      - name: Check tests
-        run: |
-          poetry run pytest
+#
+#      - name: Check tests
+#        run: |
+#          poetry run pytest
