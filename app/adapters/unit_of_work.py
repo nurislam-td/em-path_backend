@@ -1,8 +1,8 @@
+from app.adapters.repo.token import AlchemyTokenSQLRepo
+from app.adapters.repo.user import AlchemyUserSQLRepo
+from app.adapters.repo.verify_code import AlchemyVerifyCodeSQLRepo
 from app.common.database import async_session_maker
 from app.models.auth import RefreshToken, User, VerifyCode
-from app.repo.token import AlchemyTokenSQLRepo
-from app.repo.user import AlchemyUserSQLRepo
-from app.repo.verify_code import AlchemyVerifyCodeSQLRepo
 from app.schemas.token import TokenDTO
 from app.schemas.user import UserDTO
 from app.schemas.verify_code import VerifyCodeDTO

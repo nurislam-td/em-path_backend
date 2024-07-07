@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from app.repo.base import AlchemyRepo
+from app.adapters.repo.base import AlchemyRepo
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword
 from app.service.abstract.repo import UserRepo
 from app.service.secure import get_password_hash

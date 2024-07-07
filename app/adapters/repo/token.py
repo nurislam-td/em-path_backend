@@ -2,7 +2,7 @@ from typing import override
 
 from sqlalchemy import select
 
-from app.repo.base import AlchemyRepo
+from app.adapters.repo.base import AlchemyRepo
 from app.schemas.token import TokenDTO
 from app.service.abstract.repo import TokenRepo
 

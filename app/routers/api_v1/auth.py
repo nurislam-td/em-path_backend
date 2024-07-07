@@ -3,20 +3,21 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import EmailStr
 
+from app.dependencies.auth import (
+    check_email_exists,
+    validate_auth_data,
+    validate_refresh_token,
+)
+from app.dependencies.common import (
+    get_task_manager,
+    get_uow,
+)
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
 from app.service import mail_send, user
 from app.service.abstract.task_manager import ITaskManager
 from app.service.abstract.unit_of_work import UnitOfWork
-
-from .dependencies import (
-    check_email_exists,
-    get_task_manager,
-    get_uow,
-    validate_auth_data,
-    validate_refresh_token,
-)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

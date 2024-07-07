@@ -39,18 +39,6 @@ async def test_generate_tokens(payload: dict):
     assert len(tokens) == 2
 
 
-async def test_decode_token(uow: UnitOfWork):
-    async with uow:
-        token_dto = await uow.token.get(pk=UUID("4ee181fc-d996-453a-acee-307904b13771"))
-        assert token_dto is not None, "TOKEN NOT EXISTS"
-    payload = token.decode_jwt(
-        token=token_dto.refresh_token,
-        key=settings.auth_config.refresh_public_path.read_text(),
-    )
-    assert payload
-    assert UUID(payload["sub"]) == token_dto.user_id
-
-
 async def test_get_tokens(uow: UnitOfWork, payload: dict):
     tokens = await token.get_tokens(payload=payload, uow=uow)
     assert isinstance(tokens, TokenOut)

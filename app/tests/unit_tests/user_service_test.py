@@ -2,8 +2,8 @@ from uuid import UUID
 
 import pytest
 
+from app.adapters.unit_of_work import SQLAlchemyUnitOfWork
 from app.common.exceptions import UserAlreadyExistsException, UserNotExistsException
-from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 from app.schemas.token import JWTPayload
 from app.schemas.user import UserCreate, UserResetPassword
 from app.service import user

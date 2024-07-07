@@ -11,12 +11,12 @@ from app.service.abstract.task_manager import ITaskManager
 
 # TODO refactor this import
 os.environ["MODE"] = "TEST"
+from app.adapters.unit_of_work import SQLAlchemyUnitOfWork
 from app.common.database import async_engine, async_session_maker
 from app.common.settings import settings
 from app.main import app as fastapi_app
 from app.models.auth import RefreshToken, User, VerifyCode
 from app.models.base import Base
-from app.repo.unit_of_work import SQLAlchemyUnitOfWork
 
 
 @pytest.fixture(scope="session", autouse=True)

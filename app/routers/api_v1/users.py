@@ -1,14 +1,16 @@
+from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 
+from app.dependencies.common import get_file_client, get_uow
 from app.schemas.token import TokenOut
-from app.schemas.user import UserCreate, UserDTO, UserUpdate
+from app.schemas.user import Gender, UserCreate, UserDTO, UserUpdate
 from app.service import user
 from app.service.abstract.unit_of_work import UnitOfWork
 
+from ...dependencies.auth import get_current_user
 from ...service.abstract.file_client import FileClient
-from .dependencies import get_current_user, get_file_client, get_uow
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -24,14 +26,30 @@ async def register_user(
 
 @router.patch("", status_code=status.HTTP_200_OK)
 async def update_user(
-    update_data: UserUpdate = Depends(),
+    email: str = Form(None),
+    nickname: str = Form(None),
+    gender: Gender = Form(None),
+    name: str = Form(None),
+    lastname: str = Form(None),
+    patronymic: str = Form(None),
+    date_birth: date = Form(None),
+    image: UploadFile = File(None),
     uow: UnitOfWork = Depends(get_uow),
     file_client: FileClient = Depends(get_file_client),
     user_data: UserDTO = Depends(get_current_user),
 ) -> UserDTO:
     return await user.update_user(
         user_id=user_data.id,
-        update_data=update_data,
+        update_data=UserUpdate(
+            email=email,
+            nickname=nickname,
+            gender=gender,
+            name=name,
+            lastname=lastname,
+            patronymic=patronymic,
+            date_birth=date_birth,
+            image=image,
+        ),
         uow=uow,
         file_client=file_client,
     )

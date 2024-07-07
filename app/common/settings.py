@@ -66,7 +66,7 @@ class AuthJWT(CustomBaseSettings):
     jwt_alg: str = "RS256"
     access_private_path: Path = BASE_DIR / "certs" / "access-private.pem"
     access_public_path: Path = BASE_DIR / "certs" / "access-public.pem"
-    access_token_expire: int = 5  # minutes
+    access_token_expire: int = 500000  # minutes
 
     refresh_private_path: Path = BASE_DIR / "certs" / "refresh-private.pem"
     refresh_public_path: Path = BASE_DIR / "certs" / "refresh-public.pem"

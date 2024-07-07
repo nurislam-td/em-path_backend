@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from app.common.exceptions import UserAlreadyExistsException, UserNotExistsException
+from app.common.settings import settings
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserCreate, UserDTO, UserResetPassword, UserUpdate
 from app.service import token
@@ -53,12 +54,16 @@ async def update_user(
     file_client: FileClient,
 ) -> UserDTO:
     if update_data.image:
-        image_url = "avatar/user_id/update_data.image.name"
-        await file_client.upload_file(file=update_data.image, file_path=image_url)
+        file_name = "-".join(update_data.image.filename.strip().split(" "))
+        file_path = f"avatar/{user_id}/{file_name}"
+        image_url = (
+            f"{settings.s3.endpoint_url}/{settings.s3.public_bucket_name}/{file_path}"
+        )
+        await file_client.upload_file(file=update_data.image.file, file_path=file_path)
         update_data.image = image_url
     async with uow:
         updated_user: UserDTO = await uow.user.update_one(
-            update_data.model_dump(exclude_unset=True), pk=user_id
+            update_data.model_dump(exclude_unset=True, exclude_none=True), pk=user_id
         )
         await uow.commit()
         return updated_user
