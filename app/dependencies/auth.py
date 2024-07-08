@@ -89,7 +89,7 @@ def get_token_payload(
     return validate_access_token(access_token=token)
 
 
-async def check_email_exists(
+async def check_email_not_exists(
     email_in: EmailStr, uow: UnitOfWork = Depends(get_uow)
 ) -> EmailStr:
     async with uow:
@@ -97,6 +97,16 @@ async def check_email_exists(
         if user_dto:
             raise UserAlreadyExistsException
     return email_in
+
+
+async def check_email_exists(
+    email_in: EmailStr, uow: UnitOfWork = Depends(get_uow)
+) -> EmailStr:
+    async with uow:
+        user_dto: UserDTO = await uow.user.get_by_email(email_in)
+        if user_dto:
+            return email_in
+        raise UserNotExistsException
 
 
 async def get_current_user(
