@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
 
-url = "/api_v1/users"
+url = "/api/v1/users"
 
 
 @pytest.mark.parametrize(

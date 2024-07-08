@@ -14,7 +14,7 @@ from app.common.exception_handler import (
 )
 from app.common.exceptions import AppException
 from app.common.settings import settings
-from app.routers.api_v1.api import api_router
+from app.routers import api_router
 
 
 @asynccontextmanager
