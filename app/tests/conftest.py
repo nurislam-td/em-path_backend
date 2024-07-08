@@ -101,15 +101,18 @@ async def uow() -> AsyncGenerator[SQLAlchemyUnitOfWork, Any]:
 # TODO learn test mocking
 
 
-class TestTaskManager(ITaskManager):
-    def send_verify_message(self, email_in: str):
-        return bool(self and email_in)
+class TestTaskManager:
+    @staticmethod
+    def send_verify_message(email_in: str):
+        return bool(email_in)
 
-    def deactivate_verify_code(self, email_in: str):
-        return bool(self and email_in)
+    @staticmethod
+    def deactivate_verify_code(email_in: str):
+        return bool(email_in)
 
-    def clean_verify_code_table(self):
-        return bool(self)
+    @staticmethod
+    def clean_verify_code_table():
+        return True
 
 
 @pytest.fixture

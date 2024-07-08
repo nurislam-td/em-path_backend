@@ -1,10 +1,10 @@
 from app.adapters.file_client import S3FileClient
+from app.adapters.task_manager import CeleryTaskManager
 from app.adapters.unit_of_work import SQLAlchemyUnitOfWork
 from app.common.settings import settings
 from app.service.abstract.file_client import FileClient
 from app.service.abstract.task_manager import ITaskManager
 from app.service.abstract.unit_of_work import UnitOfWork
-from app.tasks.tasks import CeleryTaskManager
 
 
 def get_uow() -> UnitOfWork:
