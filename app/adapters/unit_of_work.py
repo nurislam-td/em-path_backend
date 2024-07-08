@@ -2,10 +2,6 @@ from app.adapters.repo.token import AlchemyTokenSQLRepo
 from app.adapters.repo.user import AlchemyUserSQLRepo
 from app.adapters.repo.verify_code import AlchemyVerifyCodeSQLRepo
 from app.common.database import async_session_maker
-from app.models.auth import RefreshToken, User, VerifyCode
-from app.schemas.token import TokenDTO
-from app.schemas.user import UserDTO
-from app.schemas.verify_code import VerifyCodeDTO
 from app.service.abstract.unit_of_work import UnitOfWork
 
 
@@ -18,21 +14,9 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
 
     async def __aenter__(self):
         self.session = self.session_factory()
-        self.user = AlchemyUserSQLRepo(
-            session=self.session,
-            schema=UserDTO,
-            model=User,
-        )
-        self.token = AlchemyTokenSQLRepo(
-            session=self.session,
-            schema=TokenDTO,
-            model=RefreshToken,
-        )
-        self.verify_code = AlchemyVerifyCodeSQLRepo(
-            session=self.session,
-            schema=VerifyCodeDTO,
-            model=VerifyCode,
-        )
+        self.user = AlchemyUserSQLRepo(session=self.session)
+        self.token = AlchemyTokenSQLRepo(session=self.session)
+        self.verify_code = AlchemyVerifyCodeSQLRepo(session=self.session)
 
     async def __aexit__(self, *args):
         await self.session.rollback()

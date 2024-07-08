@@ -1,4 +1,4 @@
-from typing import Type, TypeVar, cast, override
+from typing import TypeVar, cast, override
 from uuid import UUID
 
 from sqlalchemy import (
@@ -22,20 +22,13 @@ DBModel = TypeVar("DBModel", bound=DeclarativeBase)
 
 
 class AlchemyRepo(Repo[DTOSchema]):
-    _model: DBModel
-    _schema: DTOSchema
+    _model = DBModel
+    _schema = DTOSchema
 
-    def __init__(
-        self,
-        session: AsyncSession,
-        schema: Type[DTOSchema],
-        model: Type[DBModel],
-    ) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
-        self._schema = schema
-        self._model = model
-        self._table = cast(TableClause, model.__table__)
-        self._pk_col = model.__table__.primary_key.columns[0]
+        self._table = cast(TableClause, self._model.__table__)
+        self._pk_col = self._model.__table__.primary_key.columns[0]
 
     async def fetch_one(self, query: Select | Insert | Update) -> DTOSchema | None:
         result: Result = await self.session.execute(query)
