@@ -3,10 +3,8 @@ from contextlib import asynccontextmanager
 from aiobotocore.session import get_session
 from botocore.exceptions import ClientError
 
-from app.service.abstract.file_client import FileClient
 
-
-class S3FileClient(FileClient):
+class S3FileClient:
     def __init__(self, access_key, secret_key, bucket_name, endpoint_url):
         self.config = {
             "aws_access_key_id": access_key,
