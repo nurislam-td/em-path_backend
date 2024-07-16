@@ -1,4 +1,5 @@
-from typing import TypeVar, cast, override
+from ast import TypeAlias
+from typing import Any, Type, TypeVar, cast, override
 from uuid import UUID
 
 from sqlalchemy import (
@@ -6,7 +7,7 @@ from sqlalchemy import (
     Insert,
     Result,
     Select,
-    TableClause,
+    Table,
     Update,
     delete,
     insert,
@@ -18,17 +19,18 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.service.abstract.repo import DTOSchema, Repo
 
-DBModel = TypeVar("DBModel", bound=DeclarativeBase)
+DBModel = DeclarativeBase
+PK = UUID | int
 
 
 class AlchemyRepo(Repo[DTOSchema]):
-    _model = DBModel
+    _model: type[DBModel] = DBModel
     _schema = DTOSchema
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
-        self._table = cast(TableClause, self._model.__table__)
-        self._pk_col = self._model.__table__.primary_key.columns[0]
+        self._table = cast(Table, self._model.__table__)
+        self._pk_col = self._table.primary_key.columns[0]
 
     async def fetch_one(self, query: Select | Insert | Update) -> DTOSchema | None:
         result: Result = await self.session.execute(query)
@@ -50,7 +52,7 @@ class AlchemyRepo(Repo[DTOSchema]):
         await self.session.execute(query)
 
     @override
-    async def create(self, values: dict) -> DTOSchema | None:
+    async def create(self, values: dict[str, Any]) -> DTOSchema | None:
         query = insert(self._table).values(**values).returning(self._model)
         return await self.fetch_one(query)
 
@@ -60,12 +62,14 @@ class AlchemyRepo(Repo[DTOSchema]):
         return await self.fetch_all(query)
 
     @override
-    async def get(self, pk):
+    async def get(self, pk: PK):
         query = select(self._table).where(self._pk_col == pk)
         return await self.fetch_one(query)
 
     @override
-    async def update(self, values: dict, filters: dict) -> list[DTOSchema] | None:
+    async def update(
+        self, values: dict[str, Any], filters: dict
+    ) -> list[DTOSchema] | None:
         query = (
             update(self._table)
             .values(**values)
@@ -75,7 +79,7 @@ class AlchemyRepo(Repo[DTOSchema]):
         return await self.fetch_all(query)
 
     @override
-    async def update_one(self, values: dict, pk: UUID | int) -> DTOSchema | None:
+    async def update_one(self, values: dict[str, Any], pk: PK) -> DTOSchema | None:
         query = (
             update(self._table)
             .where(self._pk_col == pk)
