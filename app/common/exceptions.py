@@ -1,3 +1,5 @@
+from email import message_from_string
+
 from fastapi import status
 
 
@@ -6,7 +8,7 @@ class AppException(Exception):
     message = "Server error"
     detail = []
 
-    def __init__(self, detail: dict = None):
+    def __init__(self, detail: dict | None = None):
         self.detail = [] if detail is None else detail
 
 
@@ -33,3 +35,8 @@ class InvalidToken(AppException):
 class IncorrectVerificationCode(AppException):
     status_code = status.HTTP_400_BAD_REQUEST
     message = "Incorrect verification code"
+
+
+class Unauthorized(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    message = "Not authenticated"

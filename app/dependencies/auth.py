@@ -11,6 +11,7 @@ from starlette import status
 from app.common.exceptions import (
     IncorrectCredentialsExceptions,
     InvalidToken,
+    Unauthorized,
     UserAlreadyExistsException,
     UserNotExistsException,
 )
@@ -33,7 +34,7 @@ async def validate_auth_data(
     uow: UnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     async with uow:
-        user_dto: UserDTO = await uow.user.get_by_email(user_credentials.email)
+        user_dto: UserDTO | None = await uow.user.get_by_email(user_credentials.email)
         if not user_dto:
             raise IncorrectCredentialsExceptions
         if not secure.verify_password(user_credentials.password, user_dto.password):
@@ -81,10 +82,10 @@ def validate_access_token(access_token: str) -> JWTPayload:
 
 
 def get_token_payload(
-    http_auth: HTTPAuthorizationCredentials = Depends(http_bearer),
+    http_auth: HTTPAuthorizationCredentials | None = Depends(http_bearer),
 ) -> JWTPayload:
     if not http_auth:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise Unauthorized
     token = http_auth.credentials
     return validate_access_token(access_token=token)
 
@@ -93,7 +94,7 @@ async def check_email_not_exists(
     email_in: EmailStr, uow: UnitOfWork = Depends(get_uow)
 ) -> EmailStr:
     async with uow:
-        user_dto: UserDTO = await uow.user.get_by_email(email_in)
+        user_dto: UserDTO | None = await uow.user.get_by_email(email_in)
         if user_dto:
             raise UserAlreadyExistsException
     return email_in
@@ -103,7 +104,7 @@ async def check_email_exists(
     email_in: EmailStr, uow: UnitOfWork = Depends(get_uow)
 ) -> EmailStr:
     async with uow:
-        user_dto: UserDTO = await uow.user.get_by_email(email_in)
+        user_dto: UserDTO | None = await uow.user.get_by_email(email_in)
         if user_dto:
             return email_in
         raise UserNotExistsException
@@ -114,7 +115,7 @@ async def get_current_user(
     uow: UnitOfWork = Depends(get_uow),
 ) -> UserDTO:
     async with uow:
-        user_dto: UserDTO = await uow.user.get(pk=payload.sub)
+        user_dto: UserDTO | None = await uow.user.get(pk=payload.sub)
         if user_dto:
             return user_dto
         raise UserNotExistsException
