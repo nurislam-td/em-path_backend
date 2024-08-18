@@ -8,11 +8,11 @@ NUM = string.digits
 
 def get_password_hash(password: str) -> bytes:
     salt = bcrypt.gensalt()
-    password: bytes = password.encode()
-    return bcrypt.hashpw(password, salt)
+    password_b: bytes = password.encode()
+    return bcrypt.hashpw(password_b, salt)
 
 
-def verify_password(password: str, hash_password: str | bytes) -> bool:
+def verify_password(password: str, hash_password: bytes) -> bool:
     return bcrypt.checkpw(password=password.encode(), hashed_password=hash_password)
 
 

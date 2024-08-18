@@ -35,12 +35,14 @@ async def refresh_tokens(jwt_payload: JWTPayload, uow: UnitOfWork) -> TokenOut:
         return TokenOut(access_token=access_token, refresh_token=refresh_token)
 
 
-async def reset_password(update_data: UserResetPassword, uow: UnitOfWork) -> UserDTO:
+async def reset_password(
+    update_data: UserResetPassword, uow: UnitOfWork
+) -> UserDTO | None:
     async with uow:
-        user_dto: UserDTO = await uow.user.get_by_email(email=update_data.email)
+        user_dto: UserDTO | None = await uow.user.get_by_email(email=update_data.email)
         if not user_dto:
             raise UserNotExistsException
-        updated_user: UserDTO = await uow.user.reset_password(
+        updated_user = await uow.user.reset_password(
             user_in=update_data, user_id=user_dto.id
         )
         await uow.commit()

@@ -9,10 +9,7 @@ from app.dependencies.auth import (
     validate_auth_data,
     validate_refresh_token,
 )
-from app.dependencies.common import (
-    get_task_manager,
-    get_uow,
-)
+from app.dependencies.common import get_task_manager, get_uow
 from app.schemas.token import JWTPayload, TokenOut
 from app.schemas.user import UserDTO, UserResetPassword
 from app.schemas.verify_code import VerifyCodeCheck
@@ -76,5 +73,5 @@ async def refresh_token(
 @router.patch("/password", status_code=status.HTTP_200_OK)
 async def reset_password(
     update_data: UserResetPassword, uow: UnitOfWork = Depends(get_uow)
-) -> UserDTO:
+) -> UserDTO | None:
     return await user.reset_password(update_data=update_data, uow=uow)

@@ -30,7 +30,7 @@ class UserLogin(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     email: EmailStr = Field(validation_alias=AliasChoices("email", "username"))
-    password: str | bytes = Field(examples=["String03@"])
+    password: str = Field(examples=["String03@"])
 
     @field_validator("password", mode="after")
     @classmethod
